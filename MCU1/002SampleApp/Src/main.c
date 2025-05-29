@@ -36,11 +36,6 @@ void swap_numbers(int *x,int *y)
      *x=*y;
      *y=temp;
 
-#if 0
-     void (*jump_addr) (void);
-     jump_addr = (void*)0x20000009;
-     jump_addr();
-#endif
 
      someData = 10;
 }
