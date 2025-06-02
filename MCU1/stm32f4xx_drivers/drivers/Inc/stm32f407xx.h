@@ -135,18 +135,18 @@ typedef struct {
 /*
  * Peripheral definitions (base addresses type-casted to xxxRegDef_t)
  */
-#define GPIOA		 	(GPIO_RegDef_t*)GPIOA_BASEADDR
-#define GPIOB		 	(GPIO_RegDef_t*)GPIOB_BASEADDR
-#define GPIOC		 	(GPIO_RegDef_t*)GPIOC_BASEADDR
-#define GPIOD		 	(GPIO_RegDef_t*)GPIOD_BASEADDR
-#define GPIOE		 	(GPIO_RegDef_t*)GPIOE_BASEADDR
-#define GPIOF			(GPIO_RegDef_t*)GPIOF_BASEADDR
-#define GPIOG			(GPIO_RegDef_t*)GPIOG_BASEADDR
-#define GPIOH			(GPIO_RegDef_t*)GPIOH_BASEADDR
-#define GPIOI			(GPIO_RegDef_t*)GPIOI_BASEADDR
+#define GPIOA		 	((GPIO_RegDef_t*)GPIOA_BASEADDR)
+#define GPIOB		 	((GPIO_RegDef_t*)GPIOB_BASEADDR)
+#define GPIOC		 	((GPIO_RegDef_t*)GPIOC_BASEADDR)
+#define GPIOD		 	((GPIO_RegDef_t*)GPIOD_BASEADDR)
+#define GPIOE		 	((GPIO_RegDef_t*)GPIOE_BASEADDR)
+#define GPIOF			((GPIO_RegDef_t*)GPIOF_BASEADDR)
+#define GPIOG			((GPIO_RegDef_t*)GPIOG_BASEADDR)
+#define GPIOH			((GPIO_RegDef_t*)GPIOH_BASEADDR)
+#define GPIOI			((GPIO_RegDef_t*)GPIOI_BASEADDR)
 
 
-#define RCC				(RCC_RegDef_t*)RCC_BASEADDR
+#define RCC				((RCC_RegDef_t*)RCC_BASEADDR)
 
 
 /*
@@ -185,8 +185,8 @@ typedef struct {
  */
 
 #define USART1_PCLK_EN()			(RCC->APB2ENR |= (1<<4))
-#define USART1_PCLK_EN()			(RCC->APB2ENR |= (1<<17))
-#define USART1_PCLK_EN()			(RCC->APB2ENR |= (1<<18))
+#define USART2_PCLK_EN()			(RCC->APB2ENR |= (1<<17))
+#define USART3_PCLK_EN()			(RCC->APB2ENR |= (1<<18))
 #define UART4_PCLK_EN()				(RCC->APB2ENR |= (1<<19))
 #define UART5_PCLK_EN()				(RCC->APB2ENR |= (1<<20))
 #define USART6_PCLK_EN()			(RCC->APB2ENR |= (1<<5))
@@ -208,15 +208,15 @@ typedef struct {
  * Clock disable macros for GPIO peripherals
  */
 
-#define GPIOA_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<0))
-#define GPIOB_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<1))
-#define GPIOC_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<2))
-#define GPIOD_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<3))
-#define GPIOE_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<4))
-#define GPIOF_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<5))
-#define GPIOG_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<6))
-#define GPIOH_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<7))
-#define GPIOI_PCLK_DI()			(RCC->AHB1DIR &= ~(1<<8))
+#define GPIOA_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<0))
+#define GPIOB_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<1))
+#define GPIOC_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<2))
+#define GPIOD_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<3))
+#define GPIOE_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<4))
+#define GPIOF_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<5))
+#define GPIOG_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<6))
+#define GPIOH_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<7))
+#define GPIOI_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<8))
 
 /*
  * Clock disable macros for I2C peripherals
@@ -240,8 +240,8 @@ typedef struct {
  */
 
 #define USART1_PCLK_DI()			(RCC->APB2DIR &= ~(1<<4))
-#define USART1_PCLK_DI()			(RCC->APB2DIR &= ~(1<<17))
-#define USART1_PCLK_DI()			(RCC->APB2DIR &= ~(1<<18))
+#define USART2_PCLK_DI()			(RCC->APB2DIR &= ~(1<<17))
+#define USART3_PCLK_DI()			(RCC->APB2DIR &= ~(1<<18))
 #define UART4_PCLK_DI()				(RCC->APB2DIR &= ~(1<<19))
 #define UART5_PCLK_DI()				(RCC->APB2DIR &= ~(1<<20))
 #define USART6_PCLK_DI()			(RCC->APB2DIR &= ~(1<<5))
@@ -255,12 +255,14 @@ typedef struct {
 
 
 
+/*
+ * Utility Macros
+ */
 
+#define ENABLE 	1
+#define DISABLE 0
 
-
-
-
-
-
+#define SET 	1
+#define RESET 	0
 
 #endif /* INC_STM32F407XX_H_ */
