@@ -88,8 +88,8 @@ typedef struct{
 	GPIO_Mode_t GPIO_PinMode;
 	GPIO_Speed_t GPIO_PinSpeed;
 	GPIO_PUPD_t	GPIO_PinPuPdControl;
-	GPIO_OType_t GPIO_PinOPType;
-	GPIO_AFMode_t GPIO_PinAltFunMode;
+	GPIO_OType_t GPIO_PinOType;
+	GPIO_AFMode_t GPIO_PinAltFnMode;
 
 }GPIO_PinConfig_t;
 

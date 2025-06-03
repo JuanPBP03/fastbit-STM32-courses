@@ -72,15 +72,43 @@ void GPIO_periClockControl(GPIO_RegDef_t *p_GPIOx, uint8_t EnDi)
  * @Note				- none
  */
 void GPIO_Init(GPIO_Handle_t *p_GPIOHandle){
-	// 1. Configure pin mode
 
+	GPIO_RegDef_t *PORT = p_GPIOHandle->p_GPIOx;
+	GPIO_PinConfig_t CONFIG = p_GPIOHandle->GPIO_PinConfig;
+	GPIO_PinNum_t PinNum = CONFIG.GPIO_PinNumber;
+	PORT->MODER &= ~(0x3 << (PinNum * 2));
+
+	if(CONFIG.GPIO_PinMode <= GPIO_MODE_ANALOG){
+		// 1. Configure pin mode
+		PORT->MODER |= ((CONFIG.GPIO_PinMode)<<(PinNum*2));
+
+		// Configure alt. function if applicable
+		if(CONFIG.GPIO_PinMode == GPIO_MODE_ALTFN){
+			if(PinNum <= 7){
+				PORT->AFRL &= ~(0xF<<PinNum*4);
+				PORT->AFRL |= ((CONFIG.GPIO_PinAltFnMode)<<(PinNum*4));
+			}else{
+				PORT->AFRH &= ~(0xF<<((PinNum-8)*4));
+				PORT->AFRH |= ((CONFIG.GPIO_PinAltFnMode)<<((PinNum-8)*4));
+			}
+		}
+	}else{
+
+	}
 	// 2. Configure pin speed
+	PORT->OSPEEDR &= ~(0x3<<(PinNum*2));
+	PORT->OSPEEDR |= ((CONFIG.GPIO_PinSpeed)<<(PinNum*2));
 
 	// 3. Configure pull up/down setting
+	PORT->PUPDR &= ~(0x3<<(PinNum*2));
+	PORT->PUPDR |= ((CONFIG.GPIO_PinPuPdControl)<<(2*PinNum));
 
 	// 4. Configure output type
+	PORT->OTYPER &= ~(1<<(PinNum));
+	PORT->OTYPER |= ((CONFIG.GPIO_PinOType)<<PinNum);
 
-	// 5. Configure alt. function
+
+
 }
 
 /*********************************************************
@@ -97,7 +125,9 @@ void GPIO_Init(GPIO_Handle_t *p_GPIOHandle){
  * @Note				- none
  */
 void GPIO_Reset(GPIO_RegDef_t *p_GPIOx){
-
+	uint8_t PORTNUM = (uint8_t)(((uint32_t)p_GPIOx - AHB1_BASEADDR)/0x400);
+	RCC->AHB1RSTR |= (1 << PORTNUM);   // Assert reset
+	RCC->AHB1RSTR &= ~(1 << PORTNUM);  // Deassert reset
 }
 
 /*
