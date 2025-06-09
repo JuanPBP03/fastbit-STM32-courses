@@ -53,8 +53,8 @@ typedef enum{
 }SPI_baudPrescaler_t;
 
 typedef enum{
-	SPI_FORMAT_8_BIT = 0,
-	SPI_FORMAT_16_BIT
+	SPI_FRAME_SIZE_8_BIT = 0,
+	SPI_FRAME_SIZE_16_BIT
 }SPI_FrameSize_t;
 
 typedef enum{
@@ -124,7 +124,7 @@ extern volatile uint32_t *const SPI_RCC_RST_REGS[SPI_CHANNELS];
 
 typedef struct{
 	SPI_Channel_t channel;
-	SPI_Config_t *p_SPIConfig;
+	SPI_Config_t SPIConfig;
 }SPI_Handle_t;
 
 

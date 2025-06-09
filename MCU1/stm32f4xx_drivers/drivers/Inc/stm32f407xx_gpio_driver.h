@@ -60,22 +60,22 @@ typedef enum{
 }GPIO_PUPD_t;
 
 typedef enum{
-	AF_SYS,
-	AF_TIMER1to2,
-	AF_TIMER3to5,
-	AF_TIMER8to11,
-	AF_I2C1to3,
-	AF_SPI1to2_I2S2,
-	AF_SPI3_I2Sext_3,
-	AF_USART1to3_I2S3ext,
-	AF_UART4to5_USART6,
-	AF_CAN1to2_TIM12to14,
-	AF_OTGFS_HS,
-	AF_ETH,
-	AF_FSMC_SDIO_OTGFS,
-	AF_DCMI,
-	AF_14,
-	AF_15,
+	GPIO_AF_SYS,
+	GPIO_AF_TIMER1to2,
+	GPIO_AF_TIMER3to5,
+	GPIO_AF_TIMER8to11,
+	GPIO_AF_I2C1to3,
+	GPIO_AF_SPI1to2_I2S2,
+	GPIO_AF_SPI3_I2Sext_3,
+	GPIO_AF_USART1to3_I2S3ext,
+	GPIO_AF_UART4to5_USART6,
+	GPIO_AF_CAN1to2_TIM12to14,
+	GPIO_AF_OTGFS_HS,
+	GPIO_AF_ETH,
+	GPIO_AF_FSMC_SDIO_OTGFS,
+	GPIO_AF_DCMI,
+	GPIO_AF_14,
+	GPIO_AF_15,
 }GPIO_AFMode_t;
 
 typedef enum{
@@ -100,12 +100,12 @@ typedef enum{
 
 typedef struct{
 
-	GPIO_PinNum_t GPIO_PinNumber;
-	GPIO_Mode_t GPIO_PinMode;
-	GPIO_Speed_t GPIO_PinSpeed;
-	GPIO_PUPD_t	GPIO_PinPuPdControl;
-	GPIO_OType_t GPIO_PinOType;
-	GPIO_AFMode_t GPIO_PinAltFnMode;
+	GPIO_PinNum_t pinNumber;
+	GPIO_Mode_t pinMode;
+	GPIO_Speed_t pinSpeed;
+	GPIO_PUPD_t	pinPUPDCtrl;
+	GPIO_OType_t pinOType;
+	GPIO_AFMode_t pinAltFnMode;
 
 }GPIO_PinConfig_t;
 
@@ -137,7 +137,7 @@ uint8_t GPIO_portToIndex(GPIO_RegDef_t *p_GPIOx);
 /*
  * Peripheral clock setup
  */
-void GPIO_periClockControl(GPIO_Port_t port, uint8_t EnDi);
+void GPIO_periClockControl(GPIO_RegDef_t *port, uint8_t EnDi);
 /*
  *  Init and de-init
  */

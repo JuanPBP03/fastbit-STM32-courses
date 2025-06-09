@@ -55,12 +55,12 @@ void SPI_Reset(SPI_Channel_t channel)
 void SPI_Init(SPI_Handle_t *p_SPIHandle)
 {
 	uint8_t channel = (uint8_t)(p_SPIHandle->channel);
-	SPI_Config_t *config = p_SPIHandle->p_SPIConfig;
+	SPI_Config_t config = p_SPIHandle->SPIConfig;
 	// 0. Reset to default state
 	SPI_Reset(channel);
 
 	//	Communication mode setup
-	switch(config->commMode){
+	switch(config.commMode){
 
 	case SPI_COMM_MODE_FULL:
 		//	Default state: BIDIMODE = 0, RXONLY = 0
@@ -79,30 +79,30 @@ void SPI_Init(SPI_Handle_t *p_SPIHandle)
 		break;
 
 	}
-	if(config->Mode == SPI_MODE_MASTER)
+	if(config.Mode == SPI_MODE_MASTER)
 	{
-		SPI[channel]->CR1 |= ((config->baudPrescaler)<<SPI_CR1_BR_Pos);			//	Baud Rate
-		SPI[channel]->CR1 |= ((config->clkPol)<<SPI_CR1_CPOL_Pos);				//	Clock Polarity
-		SPI[channel]->CR1 |= ((config->clkPhase)<<SPI_CR1_CPHA_Pos);			//	Clock Phase
-		SPI[channel]->CR1 |= ((config->frameSize)<<SPI_CR1_DFF_Pos);			//	Data Frame Format
-		SPI[channel]->CR1 |= ((config->bitOrder)<<SPI_CR1_LSBFIRST_Pos);		//	MSB or LSB
-		if(!(config->frameProtocol)){
-			SPI[channel]->CR1 |= ((config->slaveSelectMode)<<SPI_CR1_SSM_Pos);	//	SSM mode
+		SPI[channel]->CR1 |= ((config.baudPrescaler)<<SPI_CR1_BR_Pos);			//	Baud Rate
+		SPI[channel]->CR1 |= ((config.clkPol)<<SPI_CR1_CPOL_Pos);				//	Clock Polarity
+		SPI[channel]->CR1 |= ((config.clkPhase)<<SPI_CR1_CPHA_Pos);			//	Clock Phase
+		SPI[channel]->CR1 |= ((config.frameSize)<<SPI_CR1_DFF_Pos);			//	Data Frame Format
+		SPI[channel]->CR1 |= ((config.bitOrder)<<SPI_CR1_LSBFIRST_Pos);		//	MSB or LSB
+		if(!(config.frameProtocol)){
+			SPI[channel]->CR1 |= ((config.slaveSelectMode)<<SPI_CR1_SSM_Pos);	//	SSM mode
 			SPI[channel]->CR1 |= (1U<<SPI_CR1_SSI_Pos);							// Set SSI bit (required when SSM = 1 in master mode)
 			SPI[channel]->CR2 &= ~(1U<<SPI_CR2_FRF_Pos);						//  Motorola
 
 		}else SPI[channel]->CR2 |= (1<<SPI_CR2_FRF_Pos);						//	TI
 
-		SPI[channel]->CR1 |= ((config->Mode)<<SPI_CR1_MSTR_Pos);				//	Master mode
+		SPI[channel]->CR1 |= ((config.Mode)<<SPI_CR1_MSTR_Pos);				//	Master mode
 	}
-	else if (config->Mode == SPI_MODE_SLAVE)
+	else if (config.Mode == SPI_MODE_SLAVE)
 	{
-		SPI[channel]->CR1 |= ((config->frameSize)<<SPI_CR1_DFF_Pos);			//	Data Frame Format
-		SPI[channel]->CR1 |= ((config->clkPol)<<SPI_CR1_CPOL_Pos);				//	Clock Polarity
-		SPI[channel]->CR1 |= ((config->clkPhase)<<SPI_CR1_CPHA_Pos);			//	Clock Phase
-		SPI[channel]->CR1 |= ((config->bitOrder)<<SPI_CR1_LSBFIRST_Pos);		//	MSB or LSB
-		if(!(config->frameProtocol)){
-			SPI[channel]->CR1 |= ((config->slaveSelectMode)<<SPI_CR1_SSM_Pos);	//	SSM mode
+		SPI[channel]->CR1 |= ((config.frameSize)<<SPI_CR1_DFF_Pos);			//	Data Frame Format
+		SPI[channel]->CR1 |= ((config.clkPol)<<SPI_CR1_CPOL_Pos);				//	Clock Polarity
+		SPI[channel]->CR1 |= ((config.clkPhase)<<SPI_CR1_CPHA_Pos);			//	Clock Phase
+		SPI[channel]->CR1 |= ((config.bitOrder)<<SPI_CR1_LSBFIRST_Pos);		//	MSB or LSB
+		if(!(config.frameProtocol)){
+			SPI[channel]->CR1 |= ((config.slaveSelectMode)<<SPI_CR1_SSM_Pos);	//	SSM mode
 			SPI[channel]->CR1 &= ~(1U<<SPI_CR1_SSI_Pos);						//	Clear SSI bit (Data sheet procedure)
 			SPI[channel]->CR2 &= ~(1U<<SPI_CR2_FRF_Pos);						//  Motorola
 
@@ -123,12 +123,14 @@ void SPI_Disable(SPI_Channel_t channel) {
 
 void SPI_Tx16(SPI_Channel_t channel, uint16_t *buffer, uint32_t len)
 {
+	uint16_t *p = buffer;
+
 	while(len!=0){
 		while (!(SPI_getFlag(channel, SPI_FLAG_TXRDY))); // TXE
 
-		SPI[channel]->DR = *buffer;
+		SPI[channel]->DR = *p;
 		len--;
-		buffer++;
+		p++;
 	}
 }
 
@@ -144,17 +146,19 @@ void SPI_Rx16(SPI_Channel_t channel, uint16_t *buffer, uint32_t len)
 
 void SPI_Tx8(SPI_Channel_t channel, uint8_t *buffer, uint32_t len)
 {
+	uint8_t *p = buffer;
 	while(len!=0){
 		while (!(SPI_getFlag(channel, SPI_FLAG_TXRDY))); // TXE
 
-		SPI[channel]->DR = *buffer;
+		SPI[channel]->DR = *p;
 		len --;
-		buffer++;
+		p++;
 	}
 }
 
 void SPI_Rx8(SPI_Channel_t channel, uint8_t *buffer, uint32_t len)
 {
+
 	while(len!=0){
 		while (!(SPI_getFlag(channel, SPI_FLAG_RXRDY))); // RXNE
 		*buffer = SPI[channel]->DR;
