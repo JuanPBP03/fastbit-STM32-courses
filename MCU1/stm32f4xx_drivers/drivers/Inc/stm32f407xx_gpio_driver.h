@@ -1,19 +1,35 @@
 /*
- * stm32f407xx_gpio_driver.h
+ * stm32f407xx_driver.h
  *
  *  Created on: Jun 2, 2025
  *      Author: JuanP
  */
 
-#ifndef INC_STM32F407XX_GPIO_DRIVER_H_
-#define INC_STM32F407XX_GPIO_DRIVER_H_
+#ifndef INC_STM32F407XX_DRIVER_H_
+#define INC_STM32F407XX_DRIVER_H_
 
 #include "stm32f407xx.h"
 
 
+
+
 /*
- *  GPIO pin configuration
+ *  GPIO configuration helpers
  */
+
+typedef enum{
+	GPIO_PORT_A = 0,
+	GPIO_PORT_B,
+	GPIO_PORT_C,
+	GPIO_PORT_D,
+	GPIO_PORT_E,
+	GPIO_PORT_F,
+	GPIO_PORT_G,
+	GPIO_PORT_H,
+	GPIO_PORT_I,
+	GPIO_PORTS
+}GPIO_Port_t;
+
 typedef enum {
 	GPIO_MODE_IN,
 	GPIO_MODE_OUT,
@@ -26,40 +42,40 @@ typedef enum {
 }GPIO_Mode_t;
 
 typedef enum {
-	GPIO_PushPull,
-	GPIO_OpenDrain
+	GPIO_OTYPE_PUSHPULL,
+	GPIO_OTYPE_ODRAIN
 }GPIO_OType_t;
 
 typedef enum{
-	GPIO_LowSpeed,
-	GPIO_MediumSpeed,
-	GPIO_HighSpeed,
-	GPIO_VeryHighSpeed
+	GPIO_SPEED_LOW,
+	GPIO_SPEED_MEDIUM,
+	GPIO_SPEED_HIGH,
+	GPIO_SPEED_VERYHIGH
 }GPIO_Speed_t;
 
 typedef enum{
-	GPIO_NoPUPD,
-	GPIO_PullUp,
-	GPIO_PullDown,
+	GPIO_PUPD_NONE,
+	GPIO_PUPD_UP,
+	GPIO_PUPD_DOWN,
 }GPIO_PUPD_t;
 
 typedef enum{
-	GPIO_AF0,
-	GPIO_AF1,
-	GPIO_AF2,
-	GPIO_AF3,
-	GPIO_AF4,
-	GPIO_AF5,
-	GPIO_AF6,
-	GPIO_AF7,
-	GPIO_AF8,
-	GPIO_AF9,
-	GPIO_AF10,
-	GPIO_AF11,
-	GPIO_AF12,
-	GPIO_AF13,
-	GPIO_AF14,
-	GPIO_AF15,
+	AF_SYS,
+	AF_TIMER1to2,
+	AF_TIMER3to5,
+	AF_TIMER8to11,
+	AF_I2C1to3,
+	AF_SPI1to2_I2S2,
+	AF_SPI3_I2Sext_3,
+	AF_USART1to3_I2S3ext,
+	AF_UART4to5_USART6,
+	AF_CAN1to2_TIM12to14,
+	AF_OTGFS_HS,
+	AF_ETH,
+	AF_FSMC_SDIO_OTGFS,
+	AF_DCMI,
+	AF_14,
+	AF_15,
 }GPIO_AFMode_t;
 
 typedef enum{
@@ -93,6 +109,11 @@ typedef struct{
 
 }GPIO_PinConfig_t;
 
+
+
+extern const GPIO_RegDef_t *GPIO[GPIO_PORTS];
+
+
 /*
  * Handle structure for GPIO pins
  */
@@ -105,23 +126,22 @@ typedef struct{
 }GPIO_Handle_t;
 
 
-/*
- * GPIO pin modes
- */
 
 
 /**********************************************************************
  * 						APIs supported by this driver
  **********************************************************************/
 
+uint8_t GPIO_portToIndex(GPIO_RegDef_t *p_GPIOx);
+
 /*
  * Peripheral clock setup
  */
-void GPIO_periClockControl(GPIO_RegDef_t *p_GPIOx, uint8_t EnDi);
+void GPIO_periClockControl(GPIO_Port_t port, uint8_t EnDi);
 /*
  *  Init and de-init
  */
-void GPIO_Init(GPIO_Handle_t *p_GPIOHandle);
+void GPIO_PinInit(GPIO_Handle_t *p_GPIOHandle);
 void GPIO_Reset(GPIO_RegDef_t *p_GPIOx);
 
 /*
@@ -136,7 +156,8 @@ void GPIO_TogglePin(GPIO_RegDef_t *p_GPIOx, uint8_t PinNumber);
 /*
  * IRQ config and ISR handling
  */
-void GPIO_IRQConfig(uint8_t IRQNum, uint8_t IRQPriority, uint8_t EnDi);
+void GPIO_IRQInterruptConfig(IRQn_t IRQn, uint8_t EnDi);
+void GPIO_IRQPriorityConfig(IRQn_t IRQn, uint8_t priority);
 void GPIO_IRQHandling(uint8_t PinNumber);
 
-#endif /* INC_STM32F407XX_GPIO_DRIVER_H_ */
+#endif /* INC_STM32F407XX_DRIVER_H_ */

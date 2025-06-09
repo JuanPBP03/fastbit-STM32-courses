@@ -11,6 +11,35 @@
 #include <stdint.h>
 
 #define __vo volatile
+
+
+/***********************************Processor Specific Details*****************************
+ *
+ * ARM Cortex Mx Processor NVIC ISERx register addresses
+ */
+
+#define NVIC_BASEADDR						0xE000E100UL
+
+typedef struct{
+	__vo uint32_t ISER[8U];
+	uint32_t RESERVED[24U];
+	__vo uint32_t ICER[8U];
+	uint32_t RESERVED1[24U];
+	__vo uint32_t ISPR[8U];
+	uint32_t RESERVED2[24U];
+	__vo uint32_t ICPR[8U];
+	uint32_t RESERVED3[24U];
+	__vo uint32_t IABR[8U];
+	uint32_t RESERVED4[56U];
+	__vo uint32_t IPR[60U];
+}NVIC_RegDef_t;
+
+
+#define NVIC_STIR		(*((__vo uint32_t*)0xE000EF00UL))
+#define NVIC			((NVIC_RegDef_t*)NVIC_BASEADDR)
+
+#define __NVIC_PRIO_BITS	4U
+
 /*
  * Flash and SRAM base addresses
  */
@@ -27,7 +56,7 @@
  */
 
 #define PERIPHERALS_BASEADDR					0x40000000UL		// Peripherals base address
-#define APB1_BASEADDR							PERIPHERALS_BASE	// APB1 base address
+#define APB1_BASEADDR							PERIPHERALS_BASEADDR	// APB1 base address
 #define APB2_BASEADDR							0x40010000UL		// APB2 base address
 #define AHB1_BASEADDR							0x40020000UL		// AHB1 base address
 #define AHB2_BASEADDR							0x50000000UL		// AHB2 base address
@@ -47,6 +76,8 @@
 #define GPIOG_BASEADDR							(AHB1_BASEADDR + 0x1800)
 #define GPIOH_BASEADDR							(AHB1_BASEADDR + 0x1C00)
 #define GPIOI_BASEADDR							(AHB1_BASEADDR + 0x2000)
+#define GPIO_ADDR_STRIDE						(0x400U)
+
 #define RCC_BASEADDR							(AHB1_BASEADDR + 0x3800)
 
 /*
@@ -74,6 +105,7 @@
 
 #define SPI1_BASEADDR 							(APB2_BASEADDR + 0X3000)
 
+
 #define USART1_BASEADDR 						(APB2_BASEADDR + 0X1000)
 #define USART6_BASEADDR 						(APB2_BASEADDR + 0X1400)
 
@@ -84,6 +116,24 @@
 /*
  *
  */
+typedef struct {
+
+	__vo uint32_t IMR;
+	__vo uint32_t EMR;
+	__vo uint32_t RTSR;
+	__vo uint32_t FTSR;
+	__vo uint32_t SWIER;
+	__vo uint32_t PR;
+
+}EXTI_RegDef_t;
+
+typedef struct {
+	__vo uint32_t MEMRMP;
+	__vo uint32_t PMC;
+	__vo uint32_t EXTICR[4];
+	uint32_t RESERVED[2];
+	__vo uint32_t CMPCR;
+}SYSCFG_RegDef_t;
 
 typedef struct {
 	__vo uint32_t MODER;
@@ -92,7 +142,7 @@ typedef struct {
 	__vo uint32_t PUPDR;
 	__vo uint32_t IDR;
 	__vo uint32_t ODR;
-	__vo uint32_t BSSR;
+	__vo uint32_t BSRR;
 	__vo uint32_t LCKR;
 	__vo uint32_t AFRL;
 	__vo uint32_t AFRH;
@@ -106,31 +156,43 @@ typedef struct {
 	__vo uint32_t AHB1RSTR;
 	__vo uint32_t AHB2RSTR;
 	__vo uint32_t AHB3RSTR;
-	__vo uint32_t RESERVED0;
+	uint32_t RESERVED0;
 	__vo uint32_t APB1RSTR;
 	__vo uint32_t APB2RSTR;
-	__vo uint32_t RESERVED1[2];
+	uint32_t RESERVED1[2];
 	__vo uint32_t AHB1ENR;
 	__vo uint32_t AHB2ENR;
 	__vo uint32_t AHB3ENR;
-	__vo uint32_t RESERVED2;
+	uint32_t RESERVED2;
 	__vo uint32_t APB1ENR;
 	__vo uint32_t APB2ENR;
-	__vo uint32_t RESERVED3[2];
+	uint32_t RESERVED3[2];
 	__vo uint32_t AHB1LPENR;
 	__vo uint32_t AHB2LPENR;
 	__vo uint32_t AHB3LPENR;
-	__vo uint32_t RESERVED4;
+	uint32_t RESERVED4;
 	__vo uint32_t APB1LPENR;
 	__vo uint32_t APB2LPENR;
-	__vo uint32_t RESERVED5[2];
+	uint32_t RESERVED5[2];
 	__vo uint32_t BDCR;
 	__vo uint32_t CSR;
-	__vo uint32_t RESERVED6[2];
+	uint32_t RESERVED6[2];
 	__vo uint32_t SSCGR;
 	__vo uint32_t PLLI2SCFGR;
 
 }RCC_RegDef_t;
+
+typedef struct {
+	__vo uint32_t CR1;
+	__vo uint32_t CR2;
+	__vo uint32_t SR;
+	__vo uint32_t DR;
+	__vo uint32_t CRCPR;
+	__vo uint32_t RXCRCR;
+	__vo uint32_t TXCRCR;
+	__vo uint32_t CFGR;
+	__vo uint32_t PR;
+}SPI_I2S_RegDef_t;
 
 
 /*
@@ -146,51 +208,15 @@ typedef struct {
 #define GPIOH			((GPIO_RegDef_t*)GPIOH_BASEADDR)
 #define GPIOI			((GPIO_RegDef_t*)GPIOI_BASEADDR)
 
-
 #define RCC				((RCC_RegDef_t*)RCC_BASEADDR)
 
+#define EXTI			((EXTI_RegDef_t*)EXTI_BASEADDR)
 
-/*
- * Clock enable macros for GPIO peripherals
- */
+#define SYSCFG			((SYSCFG_RegDef_t*)SYSCFG_BASEADDR)
 
-#define GPIOA_PCLK_EN()			(RCC->AHB1ENR |= (1<<0))
-#define GPIOB_PCLK_EN()			(RCC->AHB1ENR |= (1<<1))
-#define GPIOC_PCLK_EN()			(RCC->AHB1ENR |= (1<<2))
-#define GPIOD_PCLK_EN()			(RCC->AHB1ENR |= (1<<3))
-#define GPIOE_PCLK_EN()			(RCC->AHB1ENR |= (1<<4))
-#define GPIOF_PCLK_EN()			(RCC->AHB1ENR |= (1<<5))
-#define GPIOG_PCLK_EN()			(RCC->AHB1ENR |= (1<<6))
-#define GPIOH_PCLK_EN()			(RCC->AHB1ENR |= (1<<7))
-#define GPIOI_PCLK_EN()			(RCC->AHB1ENR |= (1<<8))
-
-/*
- * Clock enable macros for I2C peripherals
- */
-
-#define I2C1_PCLK_EN()			(RCC->APB1ENR |= (1<<21))
-#define I2C2_PCLK_EN()			(RCC->APB1ENR |= (1<<22))
-#define I2C3_PCLK_EN()			(RCC->APB1ENR |= (1<<23))
-
-/*
- * Clock enable macros for SPI peripherals
- */
-
-#define SPI1_PCLK_EN()			(RCC->APB2ENR |= (1<<12))
-#define SPI2_PCLK_EN()			(RCC->APB1ENR |= (1<<14))
-#define SPI3_PCLK_EN()			(RCC->APB1ENR |= (1<<15))
-
-
-/*
- * Clock enable macros for U(S)ART peripherals
- */
-
-#define USART1_PCLK_EN()			(RCC->APB2ENR |= (1<<4))
-#define USART2_PCLK_EN()			(RCC->APB2ENR |= (1<<17))
-#define USART3_PCLK_EN()			(RCC->APB2ENR |= (1<<18))
-#define UART4_PCLK_EN()				(RCC->APB2ENR |= (1<<19))
-#define UART5_PCLK_EN()				(RCC->APB2ENR |= (1<<20))
-#define USART6_PCLK_EN()			(RCC->APB2ENR |= (1<<5))
+#define SPI1			((SPI_I2S_RegDef_t*)SPI1_BASEADDR)
+#define SPI2			((SPI_I2S_RegDef_t*)SPI2_BASEADDR)
+#define SPI3			((SPI_I2S_RegDef_t*)SPI3_BASEADDR)
 
 
 /*
@@ -199,60 +225,31 @@ typedef struct {
 
 #define SYSCFG_PCLK_EN()			(RCC->APB2ENR |= (1<<14))
 
-
-
-
-
-
-
-/*
- * Clock disable macros for GPIO peripherals
- */
-
-#define GPIOA_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<0))
-#define GPIOB_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<1))
-#define GPIOC_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<2))
-#define GPIOD_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<3))
-#define GPIOE_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<4))
-#define GPIOF_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<5))
-#define GPIOG_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<6))
-#define GPIOH_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<7))
-#define GPIOI_PCLK_DI()			(RCC->AHB1ENR &= ~(1<<8))
-
-/*
- * Clock disable macros for I2C peripherals
- */
-
-#define I2C1_PCLK_DI()			(RCC->APB1DIR &= ~(1<<21))
-#define I2C2_PCLK_DI()			(RCC->APB1DIR &= ~(1<<22))
-#define I2C3_PCLK_DI()			(RCC->APB1DIR &= ~(1<<23))
-
-/*
- * Clock disable macros for SPI peripherals
- */
-
-#define SPI1_PCLK_DI()			(RCC->APB2DIR &= ~(1<<12))
-#define SPI2_PCLK_DI()			(RCC->APB1DIR &= ~(1<<14))
-#define SPI3_PCLK_DI()			(RCC->APB1DIR &= ~(1<<15))
-
-
-/*
- * Clock disable macros for U(S)ART peripherals
- */
-
-#define USART1_PCLK_DI()			(RCC->APB2DIR &= ~(1<<4))
-#define USART2_PCLK_DI()			(RCC->APB2DIR &= ~(1<<17))
-#define USART3_PCLK_DI()			(RCC->APB2DIR &= ~(1<<18))
-#define UART4_PCLK_DI()				(RCC->APB2DIR &= ~(1<<19))
-#define UART5_PCLK_DI()				(RCC->APB2DIR &= ~(1<<20))
-#define USART6_PCLK_DI()			(RCC->APB2DIR &= ~(1<<5))
-
-
 /*
  * Clock disable macro for SYSCFG peripherals
  */
 
 #define SYSCFG_PCLK_DI()			(RCC->APB2DIR &= ~(1<<14))
+
+
+/*
+ * 	IRQ numbers of STM32F407xx MCU
+ * 	TODO: fill the rest of the IRQn
+ */
+typedef enum{
+
+	IRQn_EXTI0 = 6,
+	IRQn_EXTI1,
+	IRQn_EXTI2,
+	IRQn_EXTI3,
+	IRQn_EXTI4,
+	IRQn_EXTI9_5 = 23,
+	IRQn_SPI1 = 35,
+	IRQn_SPI2,
+	IRQn_EXTI15_10 = 40,
+	IRQn_SPI3 = 51
+
+}IRQn_t;
 
 
 
@@ -265,5 +262,58 @@ typedef struct {
 
 #define SET 	1
 #define RESET 	0
+
+
+/**********************
+ * 	SPI BIT POSITIONS
+ **********************/
+
+#define SPI_CR1_CPHA_Pos         0U  // Clock Phase
+#define SPI_CR1_CPOL_Pos         1U  // Clock Polarity
+#define SPI_CR1_MSTR_Pos         2U  // Master Selection
+#define SPI_CR1_BR_Pos           3U  // Baud Rate Control (3 bits: [5:3])
+#define SPI_CR1_SPE_Pos          6U  // SPI Enable
+#define SPI_CR1_LSBFIRST_Pos     7U  // Frame Format (0 = MSB first)
+#define SPI_CR1_SSI_Pos          8U  // Internal Slave Select
+#define SPI_CR1_SSM_Pos          9U  // Software Slave Management
+#define SPI_CR1_RXONLY_Pos       10U // Receive Only
+#define SPI_CR1_DFF_Pos          11U // Data Frame Format (0 = 8-bit, 1 = 16-bit)
+#define SPI_CR1_CRCNEXT_Pos      12U // Transmit CRC Next
+#define SPI_CR1_CRCEN_Pos        13U // Hardware CRC Enable
+#define SPI_CR1_BIDIOE_Pos       14U // Output Enable in Bidirectional Mode
+#define SPI_CR1_BIDIMODE_Pos     15U // Bidirectional Data Mode Enable
+
+#define SPI_CR2_RXDMAEN_Pos      0U  // Rx Buffer DMA Enable
+#define SPI_CR2_TXDMAEN_Pos      1U  // Tx Buffer DMA Enable
+#define SPI_CR2_SSOE_Pos         2U  // SS Output Enable
+#define SPI_CR2_ERRIE_Pos        5U  // Error Interrupt Enable
+#define SPI_CR2_RXNEIE_Pos       6U  // RX buffer Not Empty Interrupt Enable
+#define SPI_CR2_TXEIE_Pos        7U  // Tx buffer Empty Interrupt Enable
+#define SPI_CR2_FRF_Pos          4U  // Frame Format (0 = Motorola, 1 = TI)
+#define SPI_CR2_DS_Pos           8U  // Data Size (for SPI with variable frame sizes)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include "stm32f407xx_gpio_driver.h"
+#include "stm32f407xx_spi_driver.h"
+
 
 #endif /* INC_STM32F407XX_H_ */
