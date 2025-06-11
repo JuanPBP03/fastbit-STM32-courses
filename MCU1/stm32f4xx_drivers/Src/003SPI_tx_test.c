@@ -47,11 +47,12 @@ int main(void){
 
 	SPI_Init(&SPI_Test);
 
-	SPI_Enable(SPI_CH1);
 	uint8_t message[] = "Hello World";
+	SPI_IRQConfig(SPI_CH1, ENABLE);
+	SPI_IRQPriority(SPI_CH1, 1);
 	while(1){
 
-	SPI_Tx8(SPI_CH1, message, sizeof(message));
+	SPI_Transmit_IT(SPI_CH1, message, sizeof(message));
 
 	while(SPI_getFlag(SPI_CH1, SPI_FLAG_BUSY));
 
@@ -59,4 +60,8 @@ int main(void){
 
 
 	return 0;
+}
+
+void SPI1_IRQHandler(void){
+	SPI_IRQHandler(SPI_CH1);
 }
