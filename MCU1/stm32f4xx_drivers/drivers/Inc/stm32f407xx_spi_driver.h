@@ -148,7 +148,11 @@ void SPI_Tx8(SPI_Channel_t channel, uint8_t *buffer, uint32_t len);
 
 void SPI_Rx8(SPI_Channel_t channel, uint8_t *buffer, uint32_t len);
 
-void SPI_Transmit_IT(SPI_Channel_t ch, uint8_t *buffer, uint32_t len);
+void SPI_TxIRQ(SPI_Channel_t ch, uint16_t *buffer, uint32_t len);
+
+void SPI_TxStartFrame(SPI_Channel_t channel);
+
+bool SPI_isBusy(SPI_Channel_t channel);
 
 void SPI_IRQConfig(SPI_Channel_t channel, bool ENorDI );
 void SPI_IRQPriority(SPI_Channel_t channel, uint8_t priority);
@@ -161,6 +165,8 @@ void SPI_TxIRQDis(SPI_Channel_t channel);
 
 void SPI_ErrIRQEn(SPI_Channel_t channel);
 void SPI_ErrIRQDis(SPI_Channel_t channel);
+
+
 
 void SPI_IRQHandler(SPI_Channel_t channel);
 

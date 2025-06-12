@@ -98,9 +98,13 @@ void GPIO_periClockControl(GPIO_RegDef_t *port, uint8_t EnDi)
  */
 void GPIO_PinInit(GPIO_Handle_t *p_GPIOHandle){
 
+
 	GPIO_RegDef_t *PORT = p_GPIOHandle->p_GPIOx;
 	GPIO_PinConfig_t CONFIG = p_GPIOHandle->GPIO_PinConfig;
 	GPIO_PinNum_t PinNum = CONFIG.pinNumber;
+
+	GPIO_periClockControl(PORT, ENABLE);
+
 	PORT->MODER &= ~(0x3 << (PinNum * 2));
 
 	if(CONFIG.pinMode <= GPIO_MODE_ANALOG){

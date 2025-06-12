@@ -37,8 +37,9 @@ static const IRQn_t SPI_IRQn[SPI_CHANNELS] = {
 };
 
 typedef struct {
-    uint8_t *pTxBuffer;
+    uint16_t *pTxBuffer;
     uint32_t txLen;
+    uint8_t header;
     bool busy;
 } SPI_TxContext_t;
 
@@ -67,6 +68,9 @@ void SPI_Init(SPI_Handle_t *p_SPIHandle)
 {
 	uint8_t channel = (uint8_t)(p_SPIHandle->channel);
 	SPI_Config_t config = p_SPIHandle->SPIConfig;
+
+	SPI_periClockEnable(channel);
+
 	// 0. Reset to default state
 	SPI_Reset(channel);
 
@@ -92,17 +96,24 @@ void SPI_Init(SPI_Handle_t *p_SPIHandle)
 	}
 	if(config.Mode == SPI_MODE_MASTER)
 	{
-		SPI[channel]->CR1 |= ((config.baudPrescaler)<<SPI_CR1_BR_Pos);			//	Baud Rate
-		SPI[channel]->CR1 |= ((config.clkPol)<<SPI_CR1_CPOL_Pos);				//	Clock Polarity
+		SPI[channel]->CR1 |= ((config.baudPrescaler)<<SPI_CR1_BR_Pos);		//	Baud Rate
+		SPI[channel]->CR1 |= ((config.clkPol)<<SPI_CR1_CPOL_Pos);			//	Clock Polarity
 		SPI[channel]->CR1 |= ((config.clkPhase)<<SPI_CR1_CPHA_Pos);			//	Clock Phase
 		SPI[channel]->CR1 |= ((config.frameSize)<<SPI_CR1_DFF_Pos);			//	Data Frame Format
 		SPI[channel]->CR1 |= ((config.bitOrder)<<SPI_CR1_LSBFIRST_Pos);		//	MSB or LSB
 		if(!(config.frameProtocol)){
-			SPI[channel]->CR1 |= ((config.slaveSelectMode)<<SPI_CR1_SSM_Pos);	//	SSM mode
-			SPI[channel]->CR1 |= (1U<<SPI_CR1_SSI_Pos);							// Set SSI bit (required when SSM = 1 in master mode)
-			SPI[channel]->CR2 &= ~(1U<<SPI_CR2_FRF_Pos);						//  Motorola
+			if(config.slaveSelectMode == SPI_SSM_HARDWARE){
+				SPI[channel]->CR2 |= (1U<<SPI_CR2_SSOE_Pos);
+				SPI[channel]->CR1 &= ~(1U<<SPI_CR1_SSM_Pos);				//	HARDWARE mode
 
-		}else SPI[channel]->CR2 |= (1<<SPI_CR2_FRF_Pos);						//	TI
+
+			}else if(config.slaveSelectMode == SPI_SSM_SOFTWARE){
+				SPI[channel]->CR1 &= ~(1U<<SPI_CR1_SSM_Pos);				//	SOFTWARE mode
+				SPI[channel]->CR1 |= (1U<<SPI_CR1_SSI_Pos);							// Set SSI bit (required when SSM = 1 in master mode)
+				SPI[channel]->CR2 &= ~(1U<<SPI_CR2_FRF_Pos);				//  Motorola
+			}
+
+		}else SPI[channel]->CR2 |= (1<<SPI_CR2_FRF_Pos);					//	TI
 
 		SPI[channel]->CR1 |= ((config.Mode)<<SPI_CR1_MSTR_Pos);				//	Master mode
 	}
@@ -229,18 +240,27 @@ void SPI_ErrIRQDis(SPI_Channel_t channel)
 	SPI[channel]->CR2 &= ~(1<<SPI_CR2_ERRIE_Pos);
 }
 
-void SPI_Transmit_IT(SPI_Channel_t ch, uint8_t *buffer, uint32_t len)
+void SPI_TxIRQ(SPI_Channel_t channel, uint16_t *buffer, uint32_t len)
 {
-    if (spiTxCtx[ch].busy) return;  // Already transmitting
+    if (spiTxCtx[channel].busy) return;  // Already transmitting
 
-    spiTxCtx[ch].pTxBuffer = buffer;
-    spiTxCtx[ch].txLen = len;
-    spiTxCtx[ch].busy = true;
+    spiTxCtx[channel].pTxBuffer = buffer;
+    spiTxCtx[channel].txLen = len;
+    spiTxCtx[channel].busy = true;
+    spiTxCtx[channel].header = (uint8_t)(len & 0xFF);
 
+    SPI_TxIRQEn(channel);  // Enable TXE interrupt
 
-    SPI_TxIRQEn(ch);  // Enable TXE interrupt
-    SPI_Enable(ch);
+}
+void SPI_TxStartFrame(SPI_Channel_t channel)
+{
+	if((spiTxCtx[channel].txLen)<(spiTxCtx[channel].header)) return;
+	SPI_Tx8(channel, &(spiTxCtx[channel].header), 1);
+}
 
+bool SPI_isBusy(SPI_Channel_t channel)
+{
+	return spiTxCtx[channel].busy;
 }
 
 void SPI_IRQPriority(SPI_Channel_t channel, uint8_t priority)
@@ -253,7 +273,10 @@ void SPI_IRQPriority(SPI_Channel_t channel, uint8_t priority)
 
 void SPI_IRQHandler(SPI_Channel_t channel)
 {
-
+	if(!((SPI[channel]->CR1)&(1<<SPI_CR1_DFF_Pos))){
+		uint8_t *buff8 = (uint8_t*)spiTxCtx[channel].pTxBuffer;
+		spiTxCtx[channel].txLen<<1;
+	}
 	if((SPI_getFlag(channel, SPI_FLAG_TXRDY))&&(spiTxCtx[channel].txLen>0)){
 		SPI[channel]->DR = *(spiTxCtx[channel].pTxBuffer++);
 		spiTxCtx[channel].txLen--;
