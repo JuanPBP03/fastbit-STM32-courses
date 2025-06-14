@@ -8,6 +8,8 @@
 #include "stm32f407xx_spi_driver.h"
 #include <stdbool.h>
 
+static void SPI_EndTransferIfDone(SPI_Channel_t channel);
+
 
 SPI_I2S_RegDef_t *const SPI[SPI_CHANNELS] = {
 		SPI1,
@@ -37,8 +39,10 @@ static const IRQn_t SPI_IRQn[SPI_CHANNELS] = {
 };
 
 typedef struct {
-    uint16_t *pTxBuffer;
+    uint8_t *pTxBuffer;
     uint32_t txLen;
+    uint8_t *pRxBuffer;
+    uint32_t rxLen;
     uint8_t header;
     bool busy;
 } SPI_TxContext_t;
@@ -180,12 +184,12 @@ void SPI_Tx8(SPI_Channel_t channel, uint8_t *buffer, uint32_t len)
 
 void SPI_Rx8(SPI_Channel_t channel, uint8_t *buffer, uint32_t len)
 {
-
+	uint8_t *p = buffer;
 	while(len!=0){
 		while (!(SPI_getFlag(channel, SPI_FLAG_RXRDY))); // RXNE
-		*buffer = SPI[channel]->DR;
+		*p = SPI[channel]->DR;
 		len--;
-		buffer++;
+		p++;
 	}
 }
 
@@ -240,7 +244,7 @@ void SPI_ErrIRQDis(SPI_Channel_t channel)
 	SPI[channel]->CR2 &= ~(1<<SPI_CR2_ERRIE_Pos);
 }
 
-void SPI_TxIRQ(SPI_Channel_t channel, uint16_t *buffer, uint32_t len)
+void SPI_TxIRQ(SPI_Channel_t channel, uint8_t *buffer, uint32_t len)
 {
     if (spiTxCtx[channel].busy) return;  // Already transmitting
 
@@ -252,6 +256,28 @@ void SPI_TxIRQ(SPI_Channel_t channel, uint16_t *buffer, uint32_t len)
     SPI_TxIRQEn(channel);  // Enable TXE interrupt
 
 }
+
+
+void SPI_TxRxIRQ(SPI_Channel_t channel, uint8_t *txBuffer, uint8_t *rxBuffer, uint32_t len)
+{
+    if (spiTxCtx[channel].busy) return;  // Already transmitting
+	SPI_IRQConfig(channel, DISABLE);
+
+    spiTxCtx[channel].pTxBuffer = txBuffer;
+    spiTxCtx[channel].pRxBuffer = rxBuffer;
+    spiTxCtx[channel].txLen = len;
+    spiTxCtx[channel].rxLen = len;
+    spiTxCtx[channel].busy = true;
+    spiTxCtx[channel].header = (uint8_t)(len & 0xFF);
+
+    SPI_RxIRQEn(channel);
+    SPI_TxIRQEn(channel);  // Enable TXE interrupt
+	SPI_IRQConfig(channel, ENABLE);
+
+}
+
+
+
 void SPI_TxStartFrame(SPI_Channel_t channel)
 {
 	if((spiTxCtx[channel].txLen)<(spiTxCtx[channel].header)) return;
@@ -271,21 +297,52 @@ void SPI_IRQPriority(SPI_Channel_t channel, uint8_t priority)
 	NVIC->IPR[((uint32_t)IRQn) >> 2U] |= (uint32_t)(((priority&0x0F)<<__NVIC_PRIO_BITS)<<(((uint32_t)(IRQn) & 0x3U)*8));
 }
 
-void SPI_IRQHandler(SPI_Channel_t channel)
+void SPI_EndTransferIfDone(SPI_Channel_t channel)
 {
-	if(!((SPI[channel]->CR1)&(1<<SPI_CR1_DFF_Pos))){
-		uint8_t *buff8 = (uint8_t*)spiTxCtx[channel].pTxBuffer;
-		spiTxCtx[channel].txLen<<1;
+	if(spiTxCtx[channel].txLen == 0 && spiTxCtx[channel].rxLen == 0){
+		while (!SPI_getFlag(channel, SPI_FLAG_TXRDY));    // TX register empty
+		while (SPI_getFlag(channel, SPI_FLAG_BUSY));       // SPI still busy
+		spiTxCtx[channel].busy=false;
 	}
+}
+
+void SPI_TxIRQHandler(SPI_Channel_t channel)
+{
+
 	if((SPI_getFlag(channel, SPI_FLAG_TXRDY))&&(spiTxCtx[channel].txLen>0)){
-		SPI[channel]->DR = *(spiTxCtx[channel].pTxBuffer++);
+		uint8_t tx = *(spiTxCtx[channel].pTxBuffer);
+		SPI[channel]->DR = tx;
+		spiTxCtx[channel].pTxBuffer++;
 		spiTxCtx[channel].txLen--;
 
 		if(spiTxCtx[channel].txLen==0){
 			SPI_TxIRQDis(channel);
-			spiTxCtx[channel].busy=false;
-
+			SPI_EndTransferIfDone(channel);
 		}
+
 	}
+}
+
+uint8_t SPI_RxIRQHandler(SPI_Channel_t channel)
+{
+	if(SPI_getFlag(channel, SPI_FLAG_RXRDY)){
+		uint8_t data = SPI[channel]->DR;
+
+		if(spiTxCtx[channel].rxLen > 0){
+			*(spiTxCtx[channel].pRxBuffer) = data;
+			spiTxCtx[channel].pRxBuffer++;
+			spiTxCtx[channel].rxLen--;
+
+			if(spiTxCtx[channel].rxLen==0){
+				SPI_RxIRQDis(channel);
+				SPI_EndTransferIfDone(channel);
+
+			}
+		}
+		return data;
+
+	}
+	return 0;
+
 }
 

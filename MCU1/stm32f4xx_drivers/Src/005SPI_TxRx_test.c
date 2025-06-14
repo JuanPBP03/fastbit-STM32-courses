@@ -10,7 +10,7 @@
 
 #include "stm32f407xx.h"
 #include <string.h>
-
+#include <stdbool.h>
 int main(void){
 
 	GPIO_Handle_t PORTA = { .p_GPIOx = GPIOA};
@@ -79,40 +79,56 @@ int main(void){
 	SPI1Cfg.commMode = SPI_COMM_MODE_FULL;
 	SPI1Cfg.frameSize = SPI_FRAME_SIZE_8_BIT;
 	SPI1Cfg.slaveSelectMode = SPI_SSM_HARDWARE;
-	SPI1Cfg.baudPrescaler = SPI_CLK_8;
+	SPI1Cfg.baudPrescaler = SPI_CLK_4;
 	SPI_Test.SPIConfig = SPI1Cfg;
 
 	SPI_periClockEnable(SPI_CH1);
 
 	SPI_Init(&SPI_Test);
 
-	char message[] = "I love embedded systems <3";
-	SPI_IRQConfig(SPI_CH1, ENABLE);
+	uint8_t init[] = {0x50,0xFF};
+	uint8_t command[]={0x09,0x01};
+	uint8_t rx[2] = {0, 0};
 	SPI_IRQPriority(SPI_CH1, 1);
 
 
 
-
 	while(1){
-		if(!(((SPI1->CR1)>>SPI_CR1_SPE_Pos)&0))
-			SPI_TxIRQ(SPI_CH1, (uint16_t*)message, strlen(message));
+		SPI_TxRxIRQ(SPI_CH1, init, rx, sizeof(init));
+		while(SPI_isBusy(SPI_CH1));
+
+		if(rx[1]==0xf5){
+			SPI_TxRxIRQ(SPI_CH1, command, rx ,sizeof(command));
+			SPI_Enable(SPI_CH1);
+			command[1] ^= 1;
+			rx[1]=0;
+			while(SPI_isBusy(SPI_CH1));
+
+		}
+
+		SPI_Disable(SPI_CH1);
+
 	}
-
-
 
 	return 0;
 }
 
+
 void SPI1_IRQHandler(void){
-	SPI_TxStartFrame(SPI_CH1);
-	SPI_IRQHandler(SPI_CH1);
-	if(!SPI_isBusy(SPI_CH1)){
-		while(SPI_getFlag(SPI_CH1, SPI_FLAG_BUSY));
-		SPI_Disable(SPI_CH1);
-	}
+
+
+SPI_RxIRQHandler(SPI_CH1);
+
+
+SPI_TxIRQHandler(SPI_CH1);
+
+
 }
+
+
 void EXTI0_IRQHandler(void)
 {
-	SPI_Enable(SPI_CH1);
 	GPIO_IRQHandling(0);
+	SPI_Enable(SPI_CH1);
+
 }

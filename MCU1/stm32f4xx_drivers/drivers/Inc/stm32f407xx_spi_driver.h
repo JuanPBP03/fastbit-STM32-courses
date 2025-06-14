@@ -148,7 +148,8 @@ void SPI_Tx8(SPI_Channel_t channel, uint8_t *buffer, uint32_t len);
 
 void SPI_Rx8(SPI_Channel_t channel, uint8_t *buffer, uint32_t len);
 
-void SPI_TxIRQ(SPI_Channel_t ch, uint16_t *buffer, uint32_t len);
+void SPI_TxIRQ(SPI_Channel_t ch, uint8_t *buffer, uint32_t len);
+void SPI_TxRxIRQ(SPI_Channel_t channel, uint8_t *txBuffer, uint8_t *rxBuffer, uint32_t len);
 
 void SPI_TxStartFrame(SPI_Channel_t channel);
 
@@ -168,7 +169,8 @@ void SPI_ErrIRQDis(SPI_Channel_t channel);
 
 
 
-void SPI_IRQHandler(SPI_Channel_t channel);
+void SPI_TxIRQHandler(SPI_Channel_t channel);
+uint8_t SPI_RxIRQHandler(SPI_Channel_t channel);
 
 
 #endif /* INC_STM32F407XX_SPI_DRIVER_H_ */
