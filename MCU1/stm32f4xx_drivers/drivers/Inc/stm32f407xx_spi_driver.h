@@ -128,6 +128,8 @@ typedef struct{
 }SPI_Handle_t;
 
 
+
+
 void SPI_periClockEnable(SPI_Channel_t channel);
 
 bool SPI_getFlag(SPI_Channel_t channel, SPI_StatusFlags_t flag);

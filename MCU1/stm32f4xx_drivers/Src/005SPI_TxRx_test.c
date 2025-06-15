@@ -85,42 +85,40 @@ int main(void){
 	SPI_periClockEnable(SPI_CH1);
 
 	SPI_Init(&SPI_Test);
-
-	uint8_t init[] = {0x50,0xFF};
-	uint8_t command[]={0x09,0x01};
-	uint8_t rx[2] = {0, 0};
 	SPI_IRQPriority(SPI_CH1, 1);
 
 
 
 	while(1){
-		SPI_TxRxIRQ(SPI_CH1, init, rx, sizeof(init));
-		while(SPI_isBusy(SPI_CH1));
-
-		if(rx[1]==0xf5){
-			SPI_TxRxIRQ(SPI_CH1, command, rx ,sizeof(command));
-			SPI_Enable(SPI_CH1);
-			command[1] ^= 1;
-			rx[1]=0;
-			while(SPI_isBusy(SPI_CH1));
 
 		}
 
 		SPI_Disable(SPI_CH1);
 
-	}
 
 	return 0;
 }
 
 
 void SPI1_IRQHandler(void){
+	uint8_t init[] = {0x50,0xFF};
+	uint8_t command[]={0x09,0x01};
+	uint8_t rx[2] = {0, 0};
+	SPI_TxRxIRQ(SPI_CH1, init, rx, sizeof(init));
+	while(SPI_isBusy(SPI_CH1));
+
+	if(rx[1]==0xf5){
+		SPI_TxRxIRQ(SPI_CH1, command, rx ,sizeof(command));
+		SPI_Enable(SPI_CH1);
+		command[1] ^= 1;
+		rx[1]=0;
+		while(SPI_isBusy(SPI_CH1));
+	}
+
+	SPI_RxIRQHandler(SPI_CH1);
 
 
-SPI_RxIRQHandler(SPI_CH1);
-
-
-SPI_TxIRQHandler(SPI_CH1);
+	SPI_TxIRQHandler(SPI_CH1);
 
 
 }
