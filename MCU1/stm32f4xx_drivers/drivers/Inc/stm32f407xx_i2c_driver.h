@@ -24,7 +24,7 @@ typedef enum{
 #define I2C_MODE_FM 		1
 #define I2C_MODE_SM			0
 
-#define	I2C_SPEED_SLOW		100000
+#define	I2C_SPEED_STANDARD		100000
 #define	I2C_SPEED_FAST2K	200000
 #define	I2C_SPEED_FAST4K	400000
 

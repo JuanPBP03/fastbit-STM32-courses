@@ -75,6 +75,7 @@ void I2C_Init(I2C_Handle_t *p_I2CHandle)
 	I2C_periClockCtrl(p_I2CHandle->channel, ENABLE);
 
 
+
 	if (p_I2CHandle->config.Ack == I2C_ACK_ENABLE)
 		p_I2CHandle->instance->CR1 |= I2C_CR1_ACK;
 	else
@@ -83,14 +84,16 @@ void I2C_Init(I2C_Handle_t *p_I2CHandle)
 
 	uint16_t ccr;
 	uint32_t PCLK1 = RCC_GetPCLK1Freq();
-	if(p_I2CHandle->config.Mode == I2C_MODE_SM)
+	if(p_I2CHandle->config.ClockSpeed <= I2C_SPEED_STANDARD)
 	{
 		p_I2CHandle->instance->CCR &= ~I2C_CCR_FS;
 		ccr = PCLK1 / (2*p_I2CHandle->config.ClockSpeed);
 		ccr = (ccr < 4) ? 4 : ccr;
+		p_I2CHandle->instance->TRISE &= ~0x3FUL;
+		p_I2CHandle->instance->TRISE |= (0x3FUL)&((RCC_GetPCLK1Freq()/1000000)+1);
 
 	}
-	else if(p_I2CHandle->config.Mode == I2C_MODE_FM){
+	else {
 
 		p_I2CHandle->instance->CCR |= I2C_CCR_FS;
 		if(p_I2CHandle->config.DutyCycle == I2C_FM_DUTY_2){
@@ -100,6 +103,8 @@ void I2C_Init(I2C_Handle_t *p_I2CHandle)
 			p_I2CHandle->instance->CCR |= I2C_CCR_DUTY;
 			ccr = PCLK1 / (25*p_I2CHandle->config.ClockSpeed);
 		}
+		p_I2CHandle->instance->TRISE &= ~0x3FUL;
+		p_I2CHandle->instance->TRISE |= (0x3FUL)&( ( (RCC_GetPCLK1Freq()*300) / 1000000000)+1);
 	}
 	p_I2CHandle->instance->CCR &= ~I2C_CCR_CCR;
 	p_I2CHandle->instance->CCR |= (ccr & I2C_CCR_CCR_Msk);

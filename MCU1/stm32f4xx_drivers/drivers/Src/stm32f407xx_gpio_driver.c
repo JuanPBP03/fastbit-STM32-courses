@@ -155,10 +155,9 @@ void GPIO_PinInit(GPIO_Handle_t *p_GPIOHandle){
 	PORT->PUPDR |= ((CONFIG.pinPUPDCtrl)<<(2*PinNum));
 
 	// 4. Configure output type
-	if(CONFIG.pinMode == GPIO_MODE_OUT){
-		PORT->OTYPER &= ~(1<<(PinNum));
-		PORT->OTYPER |= ((CONFIG.pinOType)<<PinNum);
-	}
+	PORT->OTYPER &= ~(1<<(PinNum));
+	PORT->OTYPER |= ((CONFIG.pinOType)<<PinNum);
+
 
 
 }

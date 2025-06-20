@@ -33,8 +33,6 @@ int main(void){
 	};
 
 
-	GPIO_periClockControl(GPIO_PORT_D, ENABLE);
-	GPIO_periClockControl(GPIO_PORT_A, ENABLE);
 	PortD.GPIO_PinConfig = LED4Pin;
 	GPIO_PinInit(&PortD);
 	PortA.GPIO_PinConfig = ButtonPin;
