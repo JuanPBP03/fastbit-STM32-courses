@@ -264,10 +264,19 @@ typedef enum{
 	IRQn_EXTI3,
 	IRQn_EXTI4,
 	IRQn_EXTI9_5 = 23,
+
+	IRQn_I2C1_EV = 31,
+	IRQn_I2C1_ER,
+	IRQn_I2C2_EV,
+	IRQn_I2C2_ER,
+
 	IRQn_SPI1 = 35,
 	IRQn_SPI2,
 	IRQn_EXTI15_10 = 40,
-	IRQn_SPI3 = 51
+	IRQn_SPI3 = 51,
+
+	IRQn_I2C3_EV = 72,
+	IRQn_I2C3_ER
 
 }IRQn_t;
 
@@ -356,9 +365,9 @@ typedef enum{
 #define I2C_SR1_RXNE_Pos		(6U)
 #define I2C_SR1_RXNE_Msk		(0x1UL<<I2C_SR1_RXNE_Pos)
 #define I2C_SR1_RXNE			I2C_SR1_RXNE_Msk
-#define I2C_SR1_TXNE_Pos		(7U)
-#define I2C_SR1_TXNE_Msk		(0x1UL<<I2C_SR1_TXNE_Pos)
-#define I2C_SR1_TXNE			I2C_SR1_TXNE_Msk
+#define I2C_SR1_TXE_Pos			(7U)
+#define I2C_SR1_TXE_Msk			(0x1UL<<I2C_SR1_TXE_Pos)
+#define I2C_SR1_TXE				I2C_SR1_TXE_Msk
 #define I2C_SR1_BERR_Pos		(8U)
 #define I2C_SR1_BERR_Msk		(0x1UL<<I2C_SR1_BERR_Pos)
 #define I2C_SR1_BERR			I2C_SR1_BERR_Msk
@@ -504,7 +513,7 @@ typedef enum{
 
 
 
-
+#include "stm32f407xx_rcc_driver.h"
 #include "stm32f407xx_gpio_driver.h"
 #include "stm32f407xx_spi_driver.h"
 #include "stm32f407xx_i2c_driver.h"

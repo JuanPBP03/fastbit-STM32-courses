@@ -47,12 +47,12 @@ int main(void){
 
 	SPI_Init(&SPI_Test);
 
-	uint8_t message[] = "Hello World";
+	uint8_t message[] = "I love embedded systems <3";
 	SPI_IRQConfig(SPI_CH1, ENABLE);
 	SPI_IRQPriority(SPI_CH1, 1);
 	while(1){
 
-	SPI_Transmit_IT(SPI_CH1, message, sizeof(message));
+	SPI_TxIRQ(SPI_CH1, message, sizeof(message));
 
 	while(SPI_getFlag(SPI_CH1, SPI_FLAG_BUSY));
 
@@ -63,5 +63,5 @@ int main(void){
 }
 
 void SPI1_IRQHandler(void){
-	SPI_IRQHandler(SPI_CH1);
+	SPI_TxIRQHandler(SPI_CH1);
 }

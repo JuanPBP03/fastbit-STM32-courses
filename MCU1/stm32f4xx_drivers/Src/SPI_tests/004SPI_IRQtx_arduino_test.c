@@ -83,7 +83,7 @@ int main(void){
 
 	while(1){
 		if(!(((SPI1->CR1)>>SPI_CR1_SPE_Pos)&0))
-			SPI_TxIRQ(SPI_CH1, (uint16_t*)message, strlen(message));
+			SPI_TxIRQ(SPI_CH1, (uint8_t*)message, strlen(message));
 	}
 
 
@@ -93,7 +93,7 @@ int main(void){
 
 void SPI1_IRQHandler(void){
 	SPI_TxStartFrame(SPI_CH1);
-	SPI_IRQHandler(SPI_CH1);
+	SPI_TxIRQHandler(SPI_CH1);
 	if(!SPI_isBusy(SPI_CH1)){
 		while(SPI_getFlag(SPI_CH1, SPI_FLAG_BUSY));
 		SPI_Disable(SPI_CH1);
