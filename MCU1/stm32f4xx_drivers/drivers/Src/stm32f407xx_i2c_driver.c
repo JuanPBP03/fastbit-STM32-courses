@@ -143,6 +143,7 @@ void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t 
 
 	while(!I2C_getFlag(hI2C->instance, I2C_FLAG_TXE));
 	while(!I2C_getFlag(hI2C->instance, I2C_FLAG_BTF));
+	//I2C_generateStopCondition(hI2C->instance);
 
 }
 
@@ -164,7 +165,6 @@ void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t 
 		I2C_generateStopCondition(hI2C->instance);
 		*(pRxBuffer) = hI2C->instance->DR;
 
-		return;
 	}
 
 

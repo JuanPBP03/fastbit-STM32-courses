@@ -9,7 +9,7 @@
 #include<stdio.h>
 #include "stm32f407xx.h"
 
-#define SLAVE_ADDR	0x90
+#define SLAVE_ADDR	(0x90>>1)
 
 
 
@@ -109,19 +109,29 @@ int main(void)
 
 	I2C1_GPIOInits();
 	I2C1_Inits();
-	I2C_PeripheralControl(hI2C1.instance, ENABLE);
 	userButtonInit();
-	uint8_t write[] = {0x00, 0x0F};
+
+	uint8_t write[15];
+	for(int i = 0;i<15;i++){
+		write[i]=(i+1)<<3;
+		}
+	uint8_t read[1];
 	while(1){
 
-		while(!GPIO_ReadPin(GPIOA, GPIO_PIN_NO_0));
+		/*while(!GPIO_ReadPin(GPIOA, GPIO_PIN_NO_0));
 		delay();
-
 		I2C_MasterTx(&hI2C1, write, sizeof(write) , SLAVE_ADDR);
+		I2C1->CR1 |= I2C_CR1_STOP;
+		*/
 
 
+		for(int i = 0;i<15;i++){
+			while(!GPIO_ReadPin(GPIOA, GPIO_PIN_NO_0));
+			delay();
+			I2C_MasterTx(&hI2C1, &write[i], 1, SLAVE_ADDR);
+			I2C_MasterRx(&hI2C1, read, 1, SLAVE_ADDR);
 
-
+			}
 
 	}
 
