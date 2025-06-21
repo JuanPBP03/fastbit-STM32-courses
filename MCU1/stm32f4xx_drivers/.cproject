@@ -58,6 +58,7 @@
 							</tool>
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.25106572" name="MCU/MPU GCC Linker" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker">
 								<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.script.791911598" name="Linker Script (-T)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.script" value="${workspace_loc:/${ProjName}/STM32F407VGTX_FLASH.ld}" valueType="string"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="true" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.otherflags.597608202" name="Other flags" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.option.otherflags" valueType="stringList"/>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.input.370841596" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -74,12 +75,9 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.1777227503" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1816436951.775611589" name="I2CtoUART_mastertxrx_test.c" rcbsApplicability="disable" resourcePath="Src/I2C_tests/I2CtoUART_mastertxrx_test.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482.1759995965">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482.1759995965" name="MCU/MPU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482"/>
-					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
-						<entry excluding="I2C_tests/I2CtoUART_mastertxrx_test.c|I2C_tests/I2CtoUART_mastertxrx_tets.c|I2C_tests/006I2C_mastertx_test.c|SPI_tests/004SPI_IRQtx_arduino_test.c|SPI_tests/003SPI_tx_test.c|GPIO_tests/002LED_BUTTON.c|GPIO_tests/001LED_TOGGLE.c|SPI_tests/005SPI_TxRx_test.c|003SPI_tx_test.c|004SPI_IRQtx_arduino_test.c|005SPI_TxRx_test.c|002LED_BUTTON.c|001LED_TOGGLE.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
+						<entry excluding="I2C_tests/I2CtoUART_mastertx_test.c|I2C_tests/I2CtoUART_mastertxrx_test.c|I2C_tests/I2CtoUART_mastertxrx_tets.c|I2C_tests/006I2C_mastertx_test.c|SPI_tests/004SPI_IRQtx_arduino_test.c|SPI_tests/003SPI_tx_test.c|GPIO_tests/002LED_BUTTON.c|GPIO_tests/001LED_TOGGLE.c|SPI_tests/005SPI_TxRx_test.c|003SPI_tx_test.c|004SPI_IRQtx_arduino_test.c|005SPI_TxRx_test.c|002LED_BUTTON.c|001LED_TOGGLE.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Startup"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
 					</sourceEntries>

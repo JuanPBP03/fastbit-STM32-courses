@@ -49,6 +49,9 @@ typedef enum{
 #define	I2C_FLAG_TIMEOUT	I2C_SR1_TIMEOUT
 #define	I2C_FLAG_SMBALERT	I2C_SR1_SMBALERT
 
+#define I2C_NO_REPEAT		ENABLE
+#define I2C_REPEAT_START	DISABLE
+
 #ifdef USE_SINGLETON_HANDLES
 typedef struct I2C_Handle I2C_Handle_t;
 
@@ -76,9 +79,9 @@ void I2C_periClockCtrl(I2C_Channel_t ch, uint8_t ENorDI);
 void I2C_Init(I2C_Handle_t *p_I2CHandle);
 void I2C_DeInit(I2C_RegDef_t *pI2Cx);
 
-void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr  );
+void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart);
 
-void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t addr);
+void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart);
 
 void I2C_SlaveTx(void);
 

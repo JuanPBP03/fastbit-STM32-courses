@@ -126,7 +126,7 @@ void I2C_Init(I2C_Handle_t *hI2C)
 }
 void I2C_DeInit(I2C_RegDef_t *pI2Cx);
 
-void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr)
+void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart)
 {
 	I2C_generateStartCondition(hI2C->instance);
 	while(!I2C_getFlag(hI2C->instance, I2C_FLAG_SB));
@@ -143,13 +143,16 @@ void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t 
 
 	while(!I2C_getFlag(hI2C->instance, I2C_FLAG_TXE));
 	while(!I2C_getFlag(hI2C->instance, I2C_FLAG_BTF));
-	//I2C_generateStopCondition(hI2C->instance);
+
+	//	Generate stop condition ONLY IF no repeated starts
+	if(repeatedStart == I2C_NO_REPEAT)
+		I2C_generateStopCondition(hI2C->instance);
 
 }
 
 
 
-void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t addr)
+void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart)
 {
 	I2C_generateStartCondition(hI2C->instance);
 	while(!I2C_getFlag(hI2C->instance, I2C_FLAG_SB));
@@ -162,7 +165,9 @@ void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t 
 		__I2C_DISABLEACK(hI2C->instance);
 		I2C_clearADDRFlag(hI2C->instance);
 		while(!I2C_getFlag(hI2C->instance, I2C_FLAG_RXNE));
-		I2C_generateStopCondition(hI2C->instance);
+		//	Generate stop condition ONLY IF no repeated starts
+		if(repeatedStart == I2C_NO_REPEAT)
+			I2C_generateStopCondition(hI2C->instance);
 		*(pRxBuffer) = hI2C->instance->DR;
 
 	}
@@ -193,7 +198,9 @@ void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t 
 		}
 
 		while(!I2C_getFlag(hI2C->instance, I2C_FLAG_BTF));
-		I2C_generateStopCondition(hI2C->instance);
+		//	Generate stop condition ONLY IF no repeated starts
+		if(repeatedStart == I2C_NO_REPEAT)
+			I2C_generateStopCondition(hI2C->instance);
 		*pRxBuffer++ = hI2C->instance->DR;
 		*pRxBuffer = hI2C->instance->DR;
 
