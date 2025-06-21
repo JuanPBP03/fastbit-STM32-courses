@@ -1,0 +1,139 @@
+/*
+ * 006I2C_mastertx_test.c
+ *
+ *  Created on: Jun 19, 2025
+ *      Author: JuanP
+ */
+
+
+#include<stdio.h>
+#include "stm32f407xx.h"
+
+#define SLAVE_ADDR	(0x90>>1)
+
+
+
+
+void delay()
+{
+	for(volatile int i = 0;i<320000;i++);
+}
+
+void userButtonInit(void)
+{
+	GPIO_Handle_t PortA;
+
+	PortA.p_GPIOx = GPIOA;
+
+	GPIO_PinConfig_t ButtonPin = {
+		.pinNumber = GPIO_PIN_NO_0,
+		.pinMode = GPIO_MODE_IN,
+		.pinSpeed = GPIO_SPEED_HIGH,
+		.pinPUPDCtrl = GPIO_PUPD_NONE
+	};
+
+	PortA.GPIO_PinConfig = ButtonPin;
+	GPIO_PinInit(&PortA);
+}
+
+void I2C1_GPIOInits(void)
+{
+	GPIO_Handle_t I2CPins;
+	I2CPins.p_GPIOx = GPIOB;
+
+	GPIO_PinConfig_t SCL =
+	{
+			.pinNumber = 6,
+			.pinMode = GPIO_MODE_ALTFN,
+			.pinPUPDCtrl = GPIO_PUPD_UP,
+			.pinOType = GPIO_OTYPE_ODRAIN,
+			.pinSpeed = GPIO_SPEED_HIGH,
+			.pinAltFnMode = GPIO_AF_I2C1to3
+	};
+	GPIO_PinConfig_t SDA =
+	{
+			.pinNumber = 9,
+			.pinMode = GPIO_MODE_ALTFN,
+			.pinPUPDCtrl = GPIO_PUPD_UP,
+			.pinOType = GPIO_OTYPE_ODRAIN,
+			.pinSpeed = GPIO_SPEED_HIGH,
+			.pinAltFnMode = GPIO_AF_I2C1to3
+	};
+
+	GPIO_PinConfig_t MCO =
+	{
+			.pinNumber = 8,
+			.pinMode = GPIO_MODE_ALTFN,
+			.pinPUPDCtrl = GPIO_PUPD_NONE,
+			.pinOType = GPIO_OTYPE_PUSHPULL,
+			.pinSpeed = GPIO_SPEED_HIGH,
+			.pinAltFnMode = GPIO_AF_SYS
+	};
+	GPIO_Handle_t Clk =
+	{
+			.GPIO_PinConfig = MCO,
+			.p_GPIOx = GPIOA
+	};
+	I2CPins.GPIO_PinConfig = SCL;
+	GPIO_PinInit(&I2CPins);
+	I2CPins.GPIO_PinConfig = SDA;
+	GPIO_PinInit(&I2CPins);
+	GPIO_PinInit(&Clk);
+}
+
+I2C_Handle_t hI2C1;
+
+
+void I2C1_Inits(void)
+{
+	hI2C1.channel = I2C_CH1;
+	hI2C1.instance = I2C1;
+
+	I2C_Config_t config =
+	{
+			.Ack = I2C_ACK_ENABLE,
+			.ClockSpeed = I2C_SPEED_STANDARD,
+			.Mode = I2C_MODE_SM,
+			.OwnAddr = 0x61,
+			.DutyCycle = 0,
+	};
+	hI2C1.config = config;
+	I2C_Init(&hI2C1);
+
+
+}
+
+
+int main(void)
+{
+
+	I2C1_GPIOInits();
+	I2C1_Inits();
+	userButtonInit();
+
+	uint8_t write[15];
+	for(int i = 0;i<15;i++){
+		write[i]=(i+1)<<3;
+		}
+	uint8_t read[1];
+	while(1){
+
+		/*while(!GPIO_ReadPin(GPIOA, GPIO_PIN_NO_0));
+		delay();
+		I2C_MasterTx(&hI2C1, write, sizeof(write) , SLAVE_ADDR);
+		I2C1->CR1 |= I2C_CR1_STOP;
+		*/
+
+
+		for(int i = 0;i<15;i++){
+			while(!GPIO_ReadPin(GPIOA, GPIO_PIN_NO_0));
+			delay();
+			I2C_MasterTx(&hI2C1, &write[i], 1, SLAVE_ADDR);
+			I2C_MasterRx(&hI2C1, read, 1, SLAVE_ADDR);
+
+			}
+
+	}
+
+	return 0;
+}

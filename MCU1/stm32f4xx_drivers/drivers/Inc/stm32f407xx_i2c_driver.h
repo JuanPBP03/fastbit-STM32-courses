@@ -78,7 +78,7 @@ void I2C_DeInit(I2C_RegDef_t *pI2Cx);
 
 void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr  );
 
-void I2C_MasterRx(void);
+void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t addr);
 
 void I2C_SlaveTx(void);
 
