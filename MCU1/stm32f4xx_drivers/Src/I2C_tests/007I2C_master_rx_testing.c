@@ -73,8 +73,8 @@ I2C_Handle_t hI2C1;
 
 void I2C1_Inits(void)
 {
-	hI2C1.channel = I2C_CH1;
 	hI2C1.instance = I2C1;
+	hI2C1.channel = I2C_CH1;
 
 	I2C_Config_t config =
 	{
