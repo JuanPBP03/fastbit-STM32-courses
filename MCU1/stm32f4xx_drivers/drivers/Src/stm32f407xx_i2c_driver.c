@@ -38,13 +38,12 @@ static I2C_Handle_t *const hI2C[I2C_CHANNELS] =
 static inline void I2C_generateStartCondition(I2C_RegDef_t *instance);
 static void I2C_executeAddressPhase(I2C_RegDef_t *instance, uint8_t addr, uint8_t rw);
 static void I2C_clearADDRFlag(I2C_Handle_t *hI2C);
-static inline void I2C_generateStopCondition(I2C_RegDef_t *instance);
-
-static void I2C_CloseCommunication(I2C_Handle_t *hI2C);
-
+inline void I2C_generateStopCondition(I2C_RegDef_t *instance);
+void I2C_CloseCommunication(I2C_Handle_t *hI2C);
 
 
-static inline void I2C_generateStopCondition(I2C_RegDef_t *instance)
+
+void I2C_generateStopCondition(I2C_RegDef_t *instance)
 {
 	instance->CR1 |= I2C_CR1_STOP;
 
@@ -139,7 +138,6 @@ void I2C_Init(I2C_Handle_t *hI2C)
 	hI2C->instance->CR2 |= (PCLK1 & I2C_CR2_FREQ);
 	hI2C->instance->OAR1 |= hI2C->config.OwnAddr<<1;
 	hI2C->instance->OAR1 |= (1UL<<14);
-	I2C_PeripheralControl(hI2C->instance, ENABLE);
 	if (hI2C->config.Ack == I2C_ACK_ENABLE)
 		hI2C->instance->CR1 |= I2C_CR1_ACK;
 	else
@@ -315,7 +313,8 @@ void I2C_ErrIRQHandler(I2C_Handle_t *hI2C)
 		hI2C->instance->SR1 &= ~(I2C_SR1_BERR);
 
 		//Implement the code to notify the application about the error
-	   I2C_ApplicationErrorCallback(hI2C,I2C_ERROR_BERR);
+
+		I2C_ApplicationErrorCallback(hI2C,I2C_ERROR_BERR);
 	}
 
 /***********************Check for arbitration lost error************************************/
@@ -379,7 +378,7 @@ void I2C_ErrIRQHandler(I2C_Handle_t *hI2C)
 	}
 }
 
-void I2c_EventIRQHandler(I2C_Handle_t *hI2C)
+void I2C_EventIRQHandler(I2C_Handle_t *hI2C)
 {
 
 	uint32_t temp1, temp2, status_flags;
@@ -412,7 +411,7 @@ void I2c_EventIRQHandler(I2C_Handle_t *hI2C)
 			if(hI2C->TxLen == 0)
 			{
 				if(hI2C->repeat == I2C_NO_REPEAT)
-				I2C_generateStopCondition(hI2C->instance);
+					I2C_generateStopCondition(hI2C->instance);
 
 				I2C_CloseCommunication(hI2C);
 
@@ -426,22 +425,23 @@ void I2c_EventIRQHandler(I2C_Handle_t *hI2C)
 				*hI2C->pRxBuffer++ = hI2C->instance->DR;
 				hI2C->RxLen--;
 			}else if(hI2C->RxLen==2)
-
 			{
 				if(hI2C->repeat == I2C_NO_REPEAT)
 					I2C_generateStopCondition(hI2C->instance);
+				if(hI2C->RxSize==2)
+					__I2C_DISABLEPOS(hI2C->instance);
 
+				if(hI2C->config.Ack == I2C_ACK_ENABLE)
+					__I2C_ENABLEACK(hI2C->instance);
 				*hI2C->pRxBuffer = hI2C->instance->DR;
 				hI2C->pRxBuffer++;
 				hI2C->RxLen--;
 
 				*hI2C->pRxBuffer = hI2C->instance->DR;
+				hI2C->pRxBuffer++;
 				hI2C->RxLen--;
 
-				__I2C_DISABLEPOS(hI2C->instance);
 
-				if(hI2C->config.Ack == I2C_ACK_ENABLE)
-					__I2C_ENABLEACK(hI2C->instance);
 
 				I2C_CloseCommunication(hI2C);
 				I2C_ApplicationEventCallback(hI2C, I2C_EV_RX_CMPLT);
@@ -469,11 +469,11 @@ void I2c_EventIRQHandler(I2C_Handle_t *hI2C)
 
 					hI2C->TxLen--;
 
-				}else if(hI2C->instance->SR2 & I2C_SR2_TRA)
-				{
-					I2C_ApplicationEventCallback(hI2C,I2C_EV_DATA_REQ);
 				}
 			}
+		}else if(hI2C->instance->SR2 & I2C_SR2_TRA)
+		{
+			I2C_ApplicationEventCallback(hI2C,I2C_EV_DATA_REQ);
 		}
 	}
 
@@ -546,17 +546,9 @@ uint8_t I2C_getFlag(I2C_RegDef_t *instance, uint32_t flag)
 		 return RESET;
 }
 
-void I2C_ApplicationEventCallback(I2C_Handle_t *hI2C, I2C_Event_t event)
-{
 
-}
 
-void I2C_ApplicationErrorCallback(I2C_Handle_t *hI2C, I2C_Error_t error)
-{
-
-}
-
-static void I2C_CloseCommunication(I2C_Handle_t *hI2C)
+void I2C_CloseCommunication(I2C_Handle_t *hI2C)
 {
 
 		hI2C->instance->CR2 &= ~I2C_CR2_ITBUFEN;

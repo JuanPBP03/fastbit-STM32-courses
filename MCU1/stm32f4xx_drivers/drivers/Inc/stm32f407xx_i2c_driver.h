@@ -32,7 +32,7 @@ typedef enum{
 #define I2C_FM_DUTY_16_9	1
 
 #define I2C_ACK_ENABLE		1
-#define I2c_ACK_DISABLE		0
+#define I2C_ACK_DISABLE		0
 
 #define	I2C_FLAG_SB			I2C_SR1_SB
 #define	I2C_FLAG_ADDR		I2C_SR1_ADDR
@@ -116,6 +116,8 @@ void I2C_periClockCtrl(I2C_Channel_t ch, uint8_t ENorDI);
 void I2C_Init(I2C_Handle_t *hI2C);
 void I2C_DeInit(I2C_RegDef_t *instance);
 
+void I2C_generateStopCondition(I2C_RegDef_t *instance);
+
 void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart);
 void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart);
 
@@ -128,7 +130,7 @@ void I2C_SlaveRx(void);
 
 void I2C_ErrIRQHandler(I2C_Handle_t *hI2C);
 
-void I2c_EventIRQHandler(I2C_Handle_t *hI2C);
+void I2C_EventIRQHandler(I2C_Handle_t *hI2C);
 
 void I2C_IRQInterruptConfig(IRQn_t IRQNumber, uint8_t ENorDI);
 void I2C_IRQPriorityConfig(IRQn_t IRQn, uint8_t priority);
@@ -140,5 +142,6 @@ uint8_t I2C_getFlag(I2C_RegDef_t *instance, uint32_t FlagName);
 void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle, I2C_Event_t event);
 void I2C_ApplicationErrorCallback(I2C_Handle_t *pI2CHandle, I2C_Error_t error);
 
+void I2C_CloseCommunication(I2C_Handle_t *hI2C);
 
 #endif /* INC_STM32F407XX_I2C_DRIVER_H_ */

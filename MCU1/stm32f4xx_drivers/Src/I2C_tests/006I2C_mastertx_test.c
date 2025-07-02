@@ -101,7 +101,7 @@ int main(void)
 		while(!GPIO_ReadPin(GPIOA, GPIO_PIN_NO_0));
 		delay();
 
-		I2C_MasterTx(&hI2C1, some_data, sizeof(some_data), SLAVE_ADDR);
+		I2C_MasterTx(&hI2C1, some_data, sizeof(some_data), SLAVE_ADDR, I2C_NO_REPEAT);
 
 
 
