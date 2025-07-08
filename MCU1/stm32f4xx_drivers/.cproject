@@ -75,12 +75,12 @@
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec.1777227503" name="MCU Output Converter Motorola S-rec with symbols" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.objcopy.symbolsrec"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1816436951.2116327540" name="008I2C_master_tx_IT_test.c" rcbsApplicability="disable" resourcePath="Src/I2C_tests/008I2C_master_tx_IT_test.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482.353689994">
-						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482.353689994" name="MCU/MPU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482"/>
+					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1816436951.1539557605" name="009I2C_slave_tx_test.c" rcbsApplicability="disable" resourcePath="Src/I2C_tests/009I2C_slave_tx_test.c" toolsToInvoke="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482.1788973064">
+						<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482.1788973064" name="MCU/MPU GCC Compiler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.934306482"/>
 					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
-						<entry excluding="I2C_tests/006I2C_mastertx_test.c|I2C_tests/007I2C_master_rx_testing.c|I2C_tests/I2CtoUART_mastertx_test.c|I2C_tests/I2CtoUART_mastertxrx_test.c|I2C_tests/I2CtoUART_mastertxrx_tets.c|SPI_tests/004SPI_IRQtx_arduino_test.c|SPI_tests/003SPI_tx_test.c|GPIO_tests/002LED_BUTTON.c|GPIO_tests/001LED_TOGGLE.c|SPI_tests/005SPI_TxRx_test.c|003SPI_tx_test.c|004SPI_IRQtx_arduino_test.c|005SPI_TxRx_test.c|002LED_BUTTON.c|001LED_TOGGLE.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
+						<entry excluding="I2C_tests/009I2C_slave_tx_test.c|I2C_tests/008I2C_master_tx_IT_test.c|I2C_tests/008I2C_slave_tx_test.c|I2C_tests/006I2C_mastertx_test.c|I2C_tests/007I2C_master_rx_testing.c|I2C_tests/I2CtoUART_mastertx_test.c|I2C_tests/I2CtoUART_mastertxrx_test.c|I2C_tests/I2CtoUART_mastertxrx_tets.c|SPI_tests/004SPI_IRQtx_arduino_test.c|SPI_tests/003SPI_tx_test.c|GPIO_tests/002LED_BUTTON.c|GPIO_tests/001LED_TOGGLE.c|SPI_tests/005SPI_TxRx_test.c|003SPI_tx_test.c|004SPI_IRQtx_arduino_test.c|005SPI_TxRx_test.c|002LED_BUTTON.c|001LED_TOGGLE.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Startup"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
 					</sourceEntries>

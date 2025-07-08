@@ -121,12 +121,13 @@ void I2C_generateStopCondition(I2C_RegDef_t *instance);
 void I2C_MasterTx(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart);
 void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart);
 
+void I2C_SlaveTx(I2C_Handle_t *hI2C, uint8_t data);
+uint8_t I2C_SlaveRx(I2C_Handle_t *hI2C);
+
 I2C_State_t I2C_MasterTx_IT(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart);
 I2C_State_t I2C_MasterRx_IT(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart);
 
-void I2C_SlaveTx(void);
-
-void I2C_SlaveRx(void);
+void I2C_SlaveCallbackEVControl(I2C_Handle_t *hI2C, uint8_t enordi);
 
 void I2C_ErrIRQHandler(I2C_Handle_t *hI2C);
 
@@ -139,8 +140,8 @@ void I2C_IRQPriorityConfig(IRQn_t IRQn, uint8_t priority);
 void I2C_PeripheralControl(I2C_RegDef_t *instance, uint8_t ENorDI);
 uint8_t I2C_getFlag(I2C_RegDef_t *instance, uint32_t FlagName);
 
-void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle, I2C_Event_t event);
-void I2C_ApplicationErrorCallback(I2C_Handle_t *pI2CHandle, I2C_Error_t error);
+void I2C_ApplicationEventCallback(I2C_Handle_t *hI2C, I2C_Event_t event);
+void I2C_ApplicationErrorCallback(I2C_Handle_t *hI2C, I2C_Error_t error);
 
 void I2C_CloseCommunication(I2C_Handle_t *hI2C);
 

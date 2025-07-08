@@ -55,6 +55,7 @@ void loop() {
   
   Wire.write(0X52); //Send this command to ask data
   Wire.endTransmission();
+  
 
   Wire.requestFrom(SLAVE_ADDR,data_len);
 

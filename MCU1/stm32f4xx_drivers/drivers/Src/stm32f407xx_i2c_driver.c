@@ -75,6 +75,31 @@ static void I2C_clearADDRFlag(I2C_Handle_t *hI2C)
 	(void)dummy;
 }
 
+void I2C_SlaveCallbackEVControl(I2C_Handle_t *hI2C, uint8_t enordi){
+	if(enordi==ENABLE){
+		//Implement the code to enable ITBUFEN Control Bit
+		hI2C->instance->CR2 |= I2C_CR2_ITBUFEN;
+
+		//Implement the code to enable ITEVFEN Control Bit
+		hI2C->instance->CR2 |= I2C_CR2_ITEVTEN;
+
+
+		//Implement the code to enable ITERREN Control Bit
+		hI2C->instance->CR2 |= I2C_CR2_ITERREN;
+	}else{
+		//Implement the code to enable ITBUFEN Control Bit
+		hI2C->instance->CR2 &= ~I2C_CR2_ITBUFEN;
+
+		//Implement the code to enable ITEVFEN Control Bit
+		hI2C->instance->CR2 &= ~I2C_CR2_ITEVTEN;
+
+
+		//Implement the code to enable ITERREN Control Bit
+		hI2C->instance->CR2 &= ~I2C_CR2_ITERREN;
+	}
+}
+
+
 #define READ	1
 #define WRITE	0
 static void I2C_executeAddressPhase(I2C_RegDef_t *instance, uint8_t addr, uint8_t rw)
@@ -132,12 +157,16 @@ void I2C_Init(I2C_Handle_t *hI2C)
 		hI2C->instance->TRISE &= ~0x3FUL;
 		hI2C->instance->TRISE |= (0x3FUL)&( ( (RCC_GetPCLK1Freq()*300) / 1000000000)+1);
 	}
+
 	hI2C->instance->CCR &= ~I2C_CCR_CCR;
 	hI2C->instance->CCR |= (ccr & I2C_CCR_CCR_Msk);
 	hI2C->instance->CR2 &= ~I2C_CR2_FREQ;
 	hI2C->instance->CR2 |= (PCLK1 & I2C_CR2_FREQ);
 	hI2C->instance->OAR1 |= hI2C->config.OwnAddr<<1;
 	hI2C->instance->OAR1 |= (1UL<<14);
+
+	I2C_PeripheralControl(hI2C->instance, ENABLE);
+
 	if (hI2C->config.Ack == I2C_ACK_ENABLE)
 		hI2C->instance->CR1 |= I2C_CR1_ACK;
 	else
@@ -229,6 +258,17 @@ void I2C_MasterRx(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len, uint8_t 
 
 }
 
+void I2C_SlaveTx(I2C_Handle_t *hI2C, uint8_t data){
+	hI2C->instance->DR = data;
+}
+
+
+uint8_t I2C_SlaveRx(I2C_Handle_t *hI2C){
+	return (uint8_t)hI2C->instance->DR;
+}
+
+
+
 
 I2C_State_t I2C_MasterTx_IT(I2C_Handle_t *hI2C, uint8_t *pTxBuffer, uint32_t len, uint8_t addr, uint8_t repeatedStart)
 {
@@ -290,10 +330,6 @@ I2C_State_t I2C_MasterRx_IT(I2C_Handle_t *hI2C, uint8_t *pRxBuffer, uint32_t len
 
 	return busystate;
 }
-
-void I2C_SlaveTx(void);
-
-void I2C_SlaveRx(void);
 
 void I2C_ErrIRQHandler(I2C_Handle_t *hI2C)
 {
@@ -385,11 +421,11 @@ void I2C_EventIRQHandler(I2C_Handle_t *hI2C)
 
 	temp1 = hI2C->instance->CR2 & I2C_CR2_ITEVTEN;
 	temp2 = hI2C->instance->CR2 & I2C_CR2_ITBUFEN;
-	status_flags = hI2C->instance->SR1 & I2C_SR1_SB;
+	status_flags = hI2C->instance->SR1;
 
 	I2C_State_t state = hI2C->State;
 
-	if(temp1 && status_flags)
+	if(temp1 && (status_flags & I2C_SR1_SB))
 	{
 		if(state == I2C_BUSY_IN_RX)
 			I2C_executeAddressPhase(hI2C->instance, hI2C->DevAddr, READ);
@@ -397,7 +433,7 @@ void I2C_EventIRQHandler(I2C_Handle_t *hI2C)
 			I2C_executeAddressPhase(hI2C->instance, hI2C->DevAddr, WRITE);
 	}
 
-	status_flags = hI2C->instance->SR1;
+
 
 	if(temp1 && (status_flags & I2C_SR1_ADDR))
 	{
@@ -450,10 +486,12 @@ void I2C_EventIRQHandler(I2C_Handle_t *hI2C)
 		}
 	}
 
+
 	if(temp1 && (status_flags & I2C_SR1_STOPF))
 	{
-		  hI2C->instance->CR1 |= I2C_CR1_PE; // CLEAR STOPF WITH DUMMY WRITE
-		  I2C_ApplicationEventCallback(hI2C, I2C_EV_STOP);
+		hI2C->instance->CR1 |= I2C_CR1_PE; // CLEAR STOPF WITH DUMMY WRITE
+		I2C_ApplicationEventCallback(hI2C, I2C_EV_STOP);
+
 	}
 
 
@@ -500,7 +538,7 @@ void I2C_EventIRQHandler(I2C_Handle_t *hI2C)
 					I2C_ApplicationEventCallback(hI2C, I2C_EV_RX_CMPLT);
 				}
 			}
-		}else if(hI2C->instance->SR2 & I2C_SR2_TRA)
+		}else if(!(hI2C->instance->SR2 & I2C_SR2_TRA))
 		{
 			I2C_ApplicationEventCallback(hI2C,I2C_EV_DATA_RCV);
 		}

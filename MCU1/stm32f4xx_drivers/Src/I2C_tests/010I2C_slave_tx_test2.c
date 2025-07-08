@@ -12,9 +12,10 @@
 
 
 #define SLAVE_ADDR	0x68
+#define MY_ADDR		0X68
 
+uint8_t txbuff[]= "01234567890123456789012345678901234567890123456789";
 
-uint8_t rcvbuff[32];
 
 
 void delay()
@@ -81,7 +82,7 @@ void I2C1_Inits(void)
 			.Ack = I2C_ACK_ENABLE,
 			.ClockSpeed = I2C_SPEED_STANDARD,
 			.Mode = I2C_MODE_SM,
-			.OwnAddr = 0x61,
+			.OwnAddr = MY_ADDR,
 			.DutyCycle = 0,
 	};
 	hI2C1.config = config;
@@ -89,14 +90,8 @@ void I2C1_Inits(void)
 
 
 }
-
-uint8_t msgReceived = 0;
-
 int main(void)
 {
-	uint8_t commandcode;
-
-	uint8_t len;
 
 	printf("Application is running\n");
 	I2C1_GPIOInits();
@@ -105,30 +100,10 @@ int main(void)
 	I2C_IRQInterruptConfig(IRQn_I2C1_EV, ENABLE);
 	I2C_IRQInterruptConfig(IRQn_I2C1_ER, ENABLE);
 
-	userButtonInit();
+	I2C_SlaveCallbackEVControl(&hI2C1, ENABLE);
 
-	while(1){
-		while(!GPIO_ReadPin(GPIOA, GPIO_PIN_NO_0));
-		delay();
 
-		commandcode = 0x51;
-
-		while(I2C_MasterTx_IT(&hI2C1, &commandcode, 1, SLAVE_ADDR, I2C_REPEAT_START) != I2C_READY);
-
-		while(I2C_MasterRx_IT(&hI2C1, &len, 1, SLAVE_ADDR, I2C_REPEAT_START) != I2C_READY);
-		commandcode = 0x52;
-
-		while(I2C_MasterTx_IT(&hI2C1, &commandcode, 1, SLAVE_ADDR, I2C_REPEAT_START) != I2C_READY);
-
-		while(I2C_MasterRx_IT(&hI2C1, rcvbuff, len, SLAVE_ADDR, I2C_NO_REPEAT) != I2C_READY);
-		msgReceived = 0;
-
-		while(msgReceived != 1);
-
-		rcvbuff[len+1] = '\0';
-
-		printf("Data: %s", rcvbuff);
-	}
+	while(1);
 
 	return 0;
 }
@@ -142,34 +117,52 @@ void I2C1_ER_IRQHandler(void)
 	I2C_ErrIRQHandler(&hI2C1);
 }
 
-void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle, I2C_Event_t event)
+static uint8_t commandCode = 0;
+static uint8_t count = 0;
+
+void I2C_ApplicationEventCallback(I2C_Handle_t *hI2C, I2C_Event_t event)
 {
+	I2C_SlaveCallbackEVControl(&hI2C1, DISABLE);
+	static uint32_t size;
+
 	switch(event){
 	case I2C_EV_DATA_RCV:
-		printf("EVENT: Tx complete\n");
+		commandCode = I2C_SlaveRx(hI2C);
+		size = sizeof(txbuff);
+		//printf("EVENT:\nData received: 0x%X\n", commandCode);
 		break;
 	case I2C_EV_DATA_REQ:
-		printf("EVENT: Tx complete\n");
+		//printf("EVENT:\nCommand code received:0x%X\n", commandCode);
+		if(commandCode == 0x51){
+			I2C_SlaveTx(hI2C,(size & 0xFF));
+			size = size>>8;
+
+		}else if (commandCode == 0x52){
+			I2C_SlaveTx(hI2C, txbuff[count++]);
+		}
 		break;
 	case I2C_EV_RX_CMPLT:
 		printf("EVENT: Rx complete\n");
-		msgReceived = 1;
 		break;
 	case I2C_EV_STOP:
-		printf("EVENT: Transaction stopped\n");
+		//printf("EVENT: Master closed transaction\n");
+		count = 0;
+
 		break;
 	case I2C_EV_TX_CMPLT:
 		printf("EVENT: Tx complete\n");
 		break;
-
-
 	}
+	I2C_SlaveCallbackEVControl(&hI2C1, ENABLE);
+
 }
-void I2C_ApplicationErrorCallback(I2C_Handle_t *pI2CHandle, I2C_Error_t error)
+void I2C_ApplicationErrorCallback(I2C_Handle_t *hI2C, I2C_Error_t error)
 {
 	switch(error){
 	case I2C_ERROR_AF:
-		printf("ERROR: Ack Failure\n");
+		//printf("EVENT: Master finished reading (NACK)\n");
+		if(commandCode != 0x52)
+			commandCode = 0xff;
 		break;
 	case I2C_ERROR_ARLO:
 		printf("ERROR: Arbitration lost\n");
@@ -192,7 +185,6 @@ void I2C_ApplicationErrorCallback(I2C_Handle_t *pI2CHandle, I2C_Error_t error)
 		printf("ERROR: Unknown\n");
 		break;
 	}
-	I2C_CloseCommunication(&hI2C1);
-	I2C_generateStopCondition(hI2C1.instance);
+
 }
 
