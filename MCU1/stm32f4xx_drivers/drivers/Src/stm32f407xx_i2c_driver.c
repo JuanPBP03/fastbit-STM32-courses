@@ -576,6 +576,8 @@ void I2C_PeripheralControl(I2C_RegDef_t *instance, uint8_t ENorDI)
 	else
 		instance->CR1 &= I2C_CR1_PE;
 }
+
+
 uint8_t I2C_getFlag(I2C_RegDef_t *instance, uint32_t flag)
 {
 	 if(instance->SR1 & flag)

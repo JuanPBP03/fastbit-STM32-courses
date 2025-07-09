@@ -254,8 +254,6 @@ typedef struct {
 #define UART4			((USART_RegDef_t *)UART4_BASEADDR)
 #define UART5			((USART_RegDef_t *)UART5_BASEADDR)
 #define USART6			((USART_RegDef_t *)USART6_BASEADDR)
-#define UART7			((USART_RegDef_t *)UART7_BASEADDR)
-#define UART8			((USART_RegDef_t *)UART8_BASEADDR)
 
 /*
  * Clock enable macros for SYSCFG peripherals
@@ -290,11 +288,20 @@ typedef enum{
 
 	IRQn_SPI1 = 35,
 	IRQn_SPI2,
-	IRQn_EXTI15_10 = 40,
-	IRQn_SPI3 = 51,
+	IRQn_USART1,
+	IRQn_USART2,
+	IRQn_USART3,
 
-	IRQn_I2C3_EV = 72,
+	IRQn_EXTI15_10 = 40,
+
+	IRQn_SPI3 = 51,
+	IRQn_UART4,
+	IRQn_USART5,
+
+	IRQn_USART6 = 71,
+	IRQn_I2C3_EV,
 	IRQn_I2C3_ER
+
 
 }IRQn_t;
 
@@ -524,100 +531,100 @@ typedef enum{
  **********************/
 
 #define USART_SR_PE_POS				(0U)
-#define USART_SR_PE					(0X01UL << #define USART_SR_PE_POS)
+#define USART_SR_PE					(0X01UL << USART_SR_PE_POS)
 #define USART_SR_FE_POS				(1U)
-#define USART_SR_FE					(0X01UL << #define USART_SR_FE_POS)
+#define USART_SR_FE					(0X01UL << USART_SR_FE_POS)
 #define USART_SR_NF_POS				(2U)
-#define USART_SR_NF					(0X01UL << #define USART_SR_NF_POS)
+#define USART_SR_NF					(0X01UL <<  USART_SR_NF_POS)
 #define USART_SR_ORE_POS			(3U)
-#define USART_SR_ORE				(0X01UL << #define USART_SR_ORE_POS)
+#define USART_SR_ORE				(0X01UL <<  USART_SR_ORE_POS)
 #define USART_SR_IDLE_POS			(4U)
-#define USART_SR_IDLE				(0X01UL << #define USART_SR_IDLE_POS)
+#define USART_SR_IDLE				(0X01UL <<  USART_SR_IDLE_POS)
 #define USART_SR_RXNE_POS			(5U)
-#define USART_SR_RXNE				(0X01UL << #define USART_SR_RXNE_POS)
+#define USART_SR_RXNE				(0X01UL <<  USART_SR_RXNE_POS)
 #define USART_SR_TC_POS				(6U)
-#define USART_SR_TC					(0X01UL << #define USART_SR_TC_POS)
+#define USART_SR_TC					(0X01UL <<  USART_SR_TC_POS)
 #define USART_SR_TXE_POS			(7U)
-#define USART_SR_TXE				(0X01UL << #define USART_SR_TXE_POS)
+#define USART_SR_TXE				(0X01UL <<  USART_SR_TXE_POS)
 #define USART_SR_LBD_POS			(8U)
-#define USART_SR_LBD				(0X01UL << #define USART_SR_LBD_POS)
+#define USART_SR_LBD				(0X01UL <<  USART_SR_LBD_POS)
 #define USART_SR_CTS_POS			(9U)
-#define USART_SR_CTS				(0X01UL << #define USART_SR_CTS_POS)
+#define USART_SR_CTS				(0X01UL <<  USART_SR_CTS_POS)
 
 #define USART_CR1_SBK_POS			(0U)
-#define USART_CR1_SBK				(0X01UL << #define USART_CR1_SBK_POS)
+#define USART_CR1_SBK				(0X01UL <<  USART_CR1_SBK_POS)
 #define USART_CR1_RWU_POS			(1U)
-#define USART_CR1_RWU				(0X01UL << #define USART_CR1_RWU_POS)
+#define USART_CR1_RWU				(0X01UL <<  USART_CR1_RWU_POS)
 #define USART_CR1_RE_POS			(2U)
-#define USART_CR1_RE				(0X01UL << #define USART_CR1_RE_POS)
+#define USART_CR1_RE				(0X01UL <<  USART_CR1_RE_POS)
 #define USART_CR1_TE_POS			(3U)
-#define USART_CR1_TE				(0X01UL << #define USART_CR1_TE_POS)
+#define USART_CR1_TE				(0X01UL <<  USART_CR1_TE_POS)
 #define USART_CR1_IDLEIE_POS		(4U)
-#define USART_CR1_IDLEIE			(0X01UL << #define USART_CR1_IDLEIE_POS)
+#define USART_CR1_IDLEIE			(0X01UL <<  USART_CR1_IDLEIE_POS)
 #define USART_CR1_RXNEIE_POS		(5U)
-#define USART_CR1_RXNEIE			(0X01UL << #define USART_CR1_RXNEIE_POS)
+#define USART_CR1_RXNEIE			(0X01UL <<  USART_CR1_RXNEIE_POS)
 #define USART_CR1_TCIE_POS			(6U)
-#define USART_CR1_TCIE				(0X01UL << #define USART_CR1_TCIE_POS)
+#define USART_CR1_TCIE				(0X01UL <<  USART_CR1_TCIE_POS)
 #define USART_CR1_TXEIE_POS			(7U)
-#define USART_CR1_TXEIE				(0X01UL << #define USART_CR1_TXEIE_POS)
+#define USART_CR1_TXEIE				(0X01UL <<  USART_CR1_TXEIE_POS)
 #define USART_CR1_PEIE_POS			(8U)
-#define USART_CR1_PEIE				(0X01UL << #define USART_CR1_PEIE_POS)
+#define USART_CR1_PEIE				(0X01UL <<  USART_CR1_PEIE_POS)
 #define USART_CR1_PS_POS			(9U)
-#define USART_CR1_PS				(0X01UL << #define USART_CR1_PS_POS)
+#define USART_CR1_PS				(0X01UL <<  USART_CR1_PS_POS)
 #define USART_CR1_PCE_POS			(10U)
-#define USART_CR1_PCE				(0X01UL << #define USART_CR1_PCE_POS)
+#define USART_CR1_PCE				(0X01UL <<  USART_CR1_PCE_POS)
 #define USART_CR1_WAKE_POS			(11U)
-#define USART_CR1_WAKE				(0X01UL << #define USART_CR1_WAKE_POS)
+#define USART_CR1_WAKE				(0X01UL <<  USART_CR1_WAKE_POS)
 #define USART_CR1_M_POS				(12U)
-#define USART_CR1_M					(0X01UL << #define USART_CR1_M_POS)
+#define USART_CR1_M					(0X01UL <<  USART_CR1_M_POS)
 #define USART_CR1_UE_POS			(13U)
-#define USART_CR1_UE				(0X01UL << #define USART_CR1_UE_POS)
+#define USART_CR1_UE				(0X01UL <<  USART_CR1_UE_POS)
 #define USART_CR1_OVER8_POS			(15U)
-#define USART_CR1_OVER8				(0X01UL << #define USART_CR1_OVER8_POS)
+#define USART_CR1_OVER8				(0X01UL <<  USART_CR1_OVER8_POS)
 
 #define USART_CR2_ADD_POS			(0U)
-#define USART_CR2_ADD				(0X0FUL << #define USART_CR2_ADD_POS)
+#define USART_CR2_ADD				(0X0FUL <<  USART_CR2_ADD_POS)
 #define USART_CR2_LBDL_POS			(5U)
-#define USART_CR2_LBDL				(0X01UL << #define USART_CR2_LBDL_POS)
+#define USART_CR2_LBDL				(0X01UL <<  USART_CR2_LBDL_POS)
 #define USART_CR2_LbDIE_POS			(6U)
-#define USART_CR2_LbDIE				(0X01UL << #define USART_CR2_LbDIE_POS)
+#define USART_CR2_LbDIE				(0X01UL <<  USART_CR2_LbDIE_POS)
 #define USART_CR2_LBCL_POS			(8U)
-#define USART_CR2_LBCL				(0X01UL << #define USART_CR2_LBCL_POS)
+#define USART_CR2_LBCL				(0X01UL <<  USART_CR2_LBCL_POS)
 #define USART_CR2_CPHA_POS			(9U)
-#define USART_CR2_CPHA				(0X01UL << #define USART_CR2_CPHA_POS)
+#define USART_CR2_CPHA				(0X01UL <<  USART_CR2_CPHA_POS)
 #define USART_CR2_CPOL_POS			(10U)
-#define USART_CR2_CPOL				(0X01UL << #define USART_CR2_CPOL_POS)
+#define USART_CR2_CPOL				(0X01UL <<  USART_CR2_CPOL_POS)
 #define USART_CR2_CLKEN_POS			(11U)
-#define USART_CR2_CLKEN				(0X01UL << #define USART_CR2_CLKEN_POS)
+#define USART_CR2_CLKEN				(0X01UL <<  USART_CR2_CLKEN_POS)
 #define USART_CR2_STOP_POS			(12U)
-#define USART_CR2_STOP				(0X03UL << #define USART_CR2_STOP_POS)
+#define USART_CR2_STOP				(0X03UL <<  USART_CR2_STOP_POS)
 #define USART_CR2_LINEN_POS			(14U)
-#define USART_CR2_LINEN				(0X01UL << #define USART_CR2_LINEN_POS)
+#define USART_CR2_LINEN				(0X01UL <<  USART_CR2_LINEN_POS)
 
 #define USART_CR3_EIE_POS			(0U)
-#define USART_CR3_EIE				(0X01UL << #define USART_CR3_EIE_POS)
+#define USART_CR3_EIE				(0X01UL <<  USART_CR3_EIE_POS)
 #define USART_CR3_IREN_POS			(1U)
-#define USART_CR3_IREN				(0X01UL << #define USART_CR3_IREN_POS)
+#define USART_CR3_IREN				(0X01UL <<  USART_CR3_IREN_POS)
 #define USART_CR3_IRLP_POS			(2U)
-#define USART_CR3_IRLP				(0X01UL << #define USART_CR3_IRLP_POS)
+#define USART_CR3_IRLP				(0X01UL <<  USART_CR3_IRLP_POS)
 #define USART_CR3_HDSEL_POS			(3U)
-#define USART_CR3_HDSEL				(0X01UL << #define USART_CR3_HDSEL_POS)
+#define USART_CR3_HDSEL				(0X01UL <<  USART_CR3_HDSEL_POS)
 #define USART_CR3_NACK_POS			(4U)
-#define USART_CR3_NACK				(0X01UL << #define USART_CR3_NACK_POS)
+#define USART_CR3_NACK				(0X01UL <<  USART_CR3_NACK_POS)
 #define USART_CR3_SCEN_POS			(5U)
-#define USART_CR3_SCEN				(0X01UL << #define USART_CR3_SCEN_POS)
+#define USART_CR3_SCEN				(0X01UL <<  USART_CR3_SCEN_POS)
 #define USART_CR3_DMAR_POS			(6U)
-#define USART_CR3_DMAR				(0X01UL << #define USART_CR3_DMAR_POS)
+#define USART_CR3_DMAR				(0X01UL <<  USART_CR3_DMAR_POS)
 #define USART_CR3_DMAT_POS			(7U)
-#define USART_CR3_DMAT				(0X01UL << #define USART_CR3_DMAT_POS)
+#define USART_CR3_DMAT				(0X01UL <<  USART_CR3_DMAT_POS)
 #define USART_CR3_RTSE_POS			(8U)
-#define USART_CR3_RTSE				(0X01UL << #define USART_CR3_RTSE_POS)
+#define USART_CR3_RTSE				(0X01UL <<  USART_CR3_RTSE_POS)
 #define USART_CR3_CTSE_POS			(9U)
-#define USART_CR3_CTSE				(0X01UL << #define USART_CR3_CTSE_POS)
+#define USART_CR3_CTSE				(0X01UL <<  USART_CR3_CTSE_POS)
 #define USART_CR3_CTSIE_POS			(10U)
-#define USART_CR3_CTSIE				(0X01UL << #define USART_CR3_CTSIE_POS)
+#define USART_CR3_CTSIE				(0X01UL <<  USART_CR3_CTSIE_POS)
 #define USART_CR3_ONEBIT_POS		(11U)
-#define USART_CR3_ONEBIT			(0X01UL << #define USART_CR3_ONEBIT_POS)
+#define USART_CR3_ONEBIT			(0X01UL <<  USART_CR3_ONEBIT_POS)
 
 
 /*
@@ -637,6 +644,7 @@ typedef enum{
 #include "stm32f407xx_gpio_driver.h"
 #include "stm32f407xx_spi_driver.h"
 #include "stm32f407xx_i2c_driver.h"
+#include "stm32f407xx_usart_driver.h"
 
 
 #endif /* INC_STM32F407XX_H_ */

@@ -8,6 +8,17 @@
 #ifndef INC_STM32F407XX_USART_DRIVER_H_
 #define INC_STM32F407XX_USART_DRIVER_H_
 
+#include <stdint.h>
+
+
+typedef enum{
+	USART_CH1 = 0,
+	USART_CH2,
+	USART_CH3,
+	UART_CH4,
+	UART_CH5,
+	USART_CH6,
+}USART_Channel_t;
 
 
 /*
@@ -15,12 +26,13 @@
  */
 typedef struct
 {
-	uint8_t USART_Mode;
-	uint32_t USART_Baud;
-	uint8_t USART_NoOfStopBits;
-	uint8_t USART_WordLength;
-	uint8_t USART_ParityControl;
-	uint8_t USART_HWFlowControl;
+	uint8_t Mode;
+	uint32_t Baud;
+	uint8_t StopBits;
+	uint8_t WordLength;
+
+	uint8_t ParityControl;
+	uint8_t HWFlowControl;
 }USART_Config_t;
 
 
@@ -29,8 +41,9 @@ typedef struct
  */
 typedef struct
 {
-	USART_RegDef_t *instance;
-	USART_Config_t   USART_Config;
+	USART_RegDef_t	*instance;
+	USART_Channel_t ch;
+	USART_Config_t	Config;
 }USART_Handle_t;
 
 
@@ -67,7 +80,7 @@ typedef struct
  */
 #define USART_PARITY_EN_ODD   2
 #define USART_PARITY_EN_EVEN  1
-#define USART_PARITY_DISABLE   0
+#define USART_PARITY_DISABLE  0
 
 /*
  *@USART_WordLength
@@ -94,16 +107,7 @@ typedef struct
 #define USART_HW_FLOW_CTRL_RTS    	2
 #define USART_HW_FLOW_CTRL_CTS_RTS	3
 
-typedef enum{
-	USART_CH1 = 0,
-	USART_CH2,
-	USART_CH3,
-	UART_CH4,
-	UART_CH5,
-	USART_CH6,
-	UART_CH7,
-	UART_CH8,
-}USART_Channel_t;
+
 
 /******************************************************************************************
  *								APIs supported by this driver
@@ -112,7 +116,7 @@ typedef enum{
 /*
  * Peripheral Clock setup
  */
-void USART_PeriClockControl(USART_RegDef_t *instance, uint8_t EnorDi);
+void USART_PeriClockControl(USART_Channel_t ch, uint8_t EnorDi);
 
 /*
  * Init and De-init
@@ -132,8 +136,8 @@ uint8_t USART_ReceiveDataIT(USART_Handle_t *hUSART, uint8_t *pRxBuffer, uint32_t
 /*
  * IRQ Configuration and ISR handling
  */
-void USART_IRQInterruptConfig(uint8_t IRQn, uint8_t EnorDi);
-void USART_IRQPriorityConfig(uint8_t IRQn, uint32_t priority);
+void USART_IRQInterruptConfig(IRQn_t IRQn, uint8_t EnorDi);
+void USART_IRQPriorityConfig(IRQn_t IRQn, uint8_t priority);
 void USART_IRQHandling(USART_Handle_t *hUSART);
 
 /*
