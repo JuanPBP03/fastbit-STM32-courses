@@ -50,3 +50,35 @@ uint32_t RCC_GetPCLK1Freq(void)
 
     return sysclk / (AHBPre * APB1Pre);
 }
+
+uint32_t RCC_GetPCLK2Freq(void)
+{
+    uint32_t sysclk;
+
+    uint32_t clk_src = (RCC->CFGR >> 2) & 0x3;
+
+    switch (clk_src)
+    {
+        case 0x00:
+            sysclk = 16000000; // HSI
+            break;
+        case 0x01:
+            sysclk = 8000000;
+            break;
+        case 0x02:
+            // PLL for now just hardcoded
+            sysclk = 84000000; // Default PLL output on F407
+            break;
+        default:
+            sysclk = 16000000; // fallback
+            break;
+    }
+
+    uint32_t ahb_code  = (RCC->CFGR >> 4) & 0xF;
+    uint32_t apb2_code = (RCC->CFGR >> 13) & 0x7;
+
+    uint32_t AHBPre  = AHB_Prescaler[ahb_code];
+    uint32_t APB2Pre = APB_Prescaler[apb2_code];
+
+    return sysclk / (AHBPre * APB2Pre);
+}

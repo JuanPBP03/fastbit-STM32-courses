@@ -9,7 +9,7 @@
 #define INC_STM32F407XX_USART_DRIVER_H_
 
 #include <stdint.h>
-
+#include "stm32f407xx.h"
 
 typedef enum{
 	USART_CH1 = 0,
@@ -44,17 +44,30 @@ typedef struct
 	USART_RegDef_t	*instance;
 	USART_Channel_t ch;
 	USART_Config_t	Config;
+	uint8_t *pTxBuffer;
+	uint8_t *pRxBuffer;
+	uint32_t TxLen;
+	uint32_t RxLen;
+	uint8_t TxBusyState;
+	uint8_t RxBusyState;
 }USART_Handle_t;
 
 
+/*
+ * FLAGS
+ */
+
+#define USART_FLAG_TXE 			USART_SR_TXE
+#define USART_FLAG_RXNE 		USART_SR_RXNE
+#define USART_FLAG_TC 			USART_SR_TC
 
 /*
  *@USART_Mode
  *Possible options for USART_Mode
  */
-#define USART_MODE_ONLY_TX 0
-#define USART_MODE_ONLY_RX 1
-#define USART_MODE_TXRX  2
+#define USART_MODE_ONLY_TX	2
+#define USART_MODE_ONLY_RX	1
+#define USART_MODE_TXRX  	3
 
 /*
  *@USART_Baud
@@ -107,12 +120,29 @@ typedef struct
 #define USART_HW_FLOW_CTRL_RTS    	2
 #define USART_HW_FLOW_CTRL_CTS_RTS	3
 
+/*
+ * Application states
+ */
+#define USART_BUSY_IN_RX 1
+#define USART_BUSY_IN_TX 2
+#define USART_READY 0
 
+
+#define 	USART_EVENT_TX_CMPLT   0
+#define		USART_EVENT_RX_CMPLT   1
+#define		USART_EVENT_IDLE      2
+#define		USART_EVENT_CTS       3
+#define		USART_EVENT_PE        4
+#define		USART_ERR_FE     	5
+#define		USART_ERR_NE    	 6
+#define		USART_ERR_ORE    	7
 
 /******************************************************************************************
  *								APIs supported by this driver
  *		 For more information about the APIs check the function definitions
  ******************************************************************************************/
+
+void USART_SetBaudRate(USART_RegDef_t *pUSARTx, uint32_t BaudRate);
 /*
  * Peripheral Clock setup
  */
@@ -122,14 +152,14 @@ void USART_PeriClockControl(USART_Channel_t ch, uint8_t EnorDi);
  * Init and De-init
  */
 void USART_Init(USART_Handle_t *hUSART);
-void USART_DeInit(USART_RegDef_t *instance);
+void USART_DeInit(USART_Handle_t *hUSART);
 
 
 /*
  * Data Send and Receive
  */
-void USART_SendData(USART_RegDef_t *instance,uint8_t *pTxBuffer, uint32_t Len);
-void USART_ReceiveData(USART_RegDef_t *instance, uint8_t *pRxBuffer, uint32_t Len);
+void USART_SendData(USART_Handle_t *hUSART,uint8_t *pTxBuffer, uint32_t Len);
+void USART_ReceiveData(USART_Handle_t *hUSART, uint8_t *pRxBuffer, uint32_t Len);
 uint8_t USART_SendDataIT(USART_Handle_t *hUSART,uint8_t *pTxBuffer, uint32_t Len);
 uint8_t USART_ReceiveDataIT(USART_Handle_t *hUSART, uint8_t *pRxBuffer, uint32_t Len);
 
@@ -144,7 +174,7 @@ void USART_IRQHandling(USART_Handle_t *hUSART);
  * Other Peripheral Control APIs
  */
 void USART_PeripheralControl(USART_RegDef_t *instance, uint8_t EnOrDi);
-uint8_t USART_GetFlagStatus(USART_RegDef_t *instance , uint32_t FlagName);
+uint8_t USART_GetFlagStatus(USART_RegDef_t *instance , uint8_t FlagName);
 void USART_ClearFlag(USART_RegDef_t *instance, uint16_t StatusFlagName);
 
 /*
