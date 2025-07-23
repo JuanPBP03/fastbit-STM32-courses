@@ -19,13 +19,13 @@ char *msg[3] = {"hihihihihihi123", "Hello How are you ?" , "Today is Monday !"};
 //reply from arduino will be stored here
 char rx_buf[1024] ;
 
-USART_Handle_t usart2_handle;
+static USART_Handle_t usart2_handle;
 
 
 //This flag indicates reception completion
-uint8_t rxCmplt = RESET;
+static uint8_t rxCmplt = RESET;
 
-uint8_t g_data = 0;
+static uint8_t g_data = 0;
 
 extern void initialise_monitor_handles();
 
