@@ -142,7 +142,7 @@ typedef struct
  *		 For more information about the APIs check the function definitions
  ******************************************************************************************/
 
-void USART_SetBaudRate(USART_RegDef_t *pUSARTx, uint32_t BaudRate);
+void USART_SetBaudRate(USART_RegDef_t *instance, uint32_t BaudRate);
 /*
  * Peripheral Clock setup
  */
