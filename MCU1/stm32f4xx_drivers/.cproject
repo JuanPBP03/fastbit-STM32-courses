@@ -115,7 +115,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
 						<entry excluding="USART_test/12USART_senddata_test.c|USART_test/11USART_rxtest.c|USART_test/USART_senddata_test.c|I2C_tests/010I2C_slave_tx_test2.c|I2C_tests/009I2C_slave_tx_test.c|I2C_tests/008I2C_master_tx_IT_test.c|I2C_tests/008I2C_slave_tx_test.c|I2C_tests/006I2C_mastertx_test.c|I2C_tests/007I2C_master_rx_testing.c|I2C_tests/I2CtoUART_mastertx_test.c|I2C_tests/I2CtoUART_mastertxrx_test.c|I2C_tests/I2CtoUART_mastertxrx_tets.c|SPI_tests/004SPI_IRQtx_arduino_test.c|SPI_tests/003SPI_tx_test.c|GPIO_tests/002LED_BUTTON.c|GPIO_tests/001LED_TOGGLE.c|SPI_tests/005SPI_TxRx_test.c|003SPI_tx_test.c|004SPI_IRQtx_arduino_test.c|005SPI_TxRx_test.c|002LED_BUTTON.c|001LED_TOGGLE.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Startup"/>
-						<entry excluding="lcd.h|lcd.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="bsp"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="bsp"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
 					</sourceEntries>
 				</configuration>
