@@ -38,6 +38,17 @@ void lcd_print_char(uint8_t data)
 
 }
 
+void lcd_print_string(uint8_t *message)
+{
+
+      do
+      {
+          lcd_print_char((uint8_t)*message++);
+      }
+      while (*message != '\0');
+
+}
+
 void lcd_init(void)
 {
 
@@ -143,6 +154,31 @@ uint8_t lcd_isBusy(void){
 
 void lcd_display_clear(void){
 	lcd_send_command(LCD_CMD_DIS_CLEAR);
+}
+
+void lcd_display_return_home(void)
+{
+
+	lcd_send_command(LCD_CMD_DIS_RETURN_HOME);
+
+}
+
+void lcd_set_cursor(uint8_t row, uint8_t column)
+{
+  column--;
+  switch (row)
+  {
+    case 1:
+      /* Set cursor to 1st row address and add index*/
+      lcd_send_command((column |= 0x80));
+      break;
+    case 2:
+      /* Set cursor to 2nd row address and add index*/
+       lcd_send_command((column |= 0xC0));
+      break;
+    default:
+      break;
+  }
 }
 
 static void mdelay(uint32_t cnt)
