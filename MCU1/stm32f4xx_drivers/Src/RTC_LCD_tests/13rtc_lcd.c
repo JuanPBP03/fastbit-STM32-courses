@@ -13,6 +13,8 @@
 
 #include "lcd.h"
 
+#define PRINT_LCD
+
 #define SYSTICK_TIM_CLK   16000000UL
 
 /* Enable this macro if you want to test RTC on LCD */
@@ -45,7 +47,12 @@ void init_systick_timer(uint32_t tick_hz)
 
 char* get_day_of_week(uint8_t i)
 {
+#ifndef PRINT_LCD
 	char* days[] = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
+#else
+	char* days[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+#endif
+
 
 	return days[i-1];
 }
@@ -134,14 +141,14 @@ int main(void)
 
 	init_systick_timer(1);
 
-	current_date.day = WEDNESDAY;
-	current_date.date = 23;
+	current_date.day = TUESDAY;
+	current_date.date = 29;
 	current_date.month = 7;
 	current_date.year = 25;
 
-	current_time.hours = 5;
-	current_time.minutes = 47;
-	current_time.seconds = 30;
+	current_time.hours = 9;
+	current_time.minutes = 53;
+	current_time.seconds = 2;
 	current_time.time_format = TIME_FORMAT_12HRS_PM;
 
 	ds1307_set_current_date(&current_date);

@@ -14,7 +14,7 @@ static void udelay(uint32_t cnt);
 void lcd_send_command(uint8_t cmd)
 {
 	/* RS=0 for LCD command */
-	GPIO_WritePin(LCD_GPIO_PORT, LCD_GPIO_RS, SET);
+	GPIO_WritePin(LCD_GPIO_PORT, LCD_GPIO_RS, RESET);
 
 	/*R/nW = 0, for write */
 	GPIO_WritePin(LCD_GPIO_PORT, LCD_GPIO_RW, RESET);
@@ -30,7 +30,7 @@ void lcd_print_char(uint8_t data)
 	GPIO_WritePin(LCD_GPIO_PORT, LCD_GPIO_RS, SET);
 
 	/*R/nW = 0, for write */
-	GPIO_WritePin(LCD_GPIO_PORT, LCD_GPIO_RW, SET);
+	GPIO_WritePin(LCD_GPIO_PORT, LCD_GPIO_RW, RESET);
 
 	write_4_bits(data >> 4);  /*Higher nibble*/
 	write_4_bits(data & 0x0F); /*Lower nibble*/
@@ -38,7 +38,7 @@ void lcd_print_char(uint8_t data)
 
 }
 
-void lcd_print_string(uint8_t *message)
+void lcd_print_string(char *message)
 {
 
       do
@@ -102,27 +102,25 @@ void lcd_init(void)
 
 	write_4_bits(0x3);
 
-	udelay(37);
+	udelay(40);
 
 	write_4_bits(0x2);
 	write_4_bits(0x8);
 
 
-	udelay(37);
+	udelay(40);
 
 	//function set command
 	lcd_send_command(LCD_CMD_4DL_2N_5X8F);
 
 	//disply ON and cursor ON
 	lcd_send_command(0x0F);
-	while(lcd_isBusy());
 
 	lcd_display_clear();
-	while(lcd_isBusy());
 
 	//entry mode set
 	lcd_send_command(LCD_CMD_INCADD);
-	while(lcd_isBusy());
+
 
 }
 
@@ -143,6 +141,8 @@ static void lcd_enable(void)
 	GPIO_WritePin(LCD_GPIO_PORT, LCD_GPIO_EN, SET);
 	udelay(10);
 	GPIO_WritePin(LCD_GPIO_PORT, LCD_GPIO_EN, RESET);
+	udelay(40);
+
 }
 
 uint8_t lcd_isBusy(void){
@@ -154,12 +154,16 @@ uint8_t lcd_isBusy(void){
 
 void lcd_display_clear(void){
 	lcd_send_command(LCD_CMD_DIS_CLEAR);
+	mdelay(2);
+
 }
 
 void lcd_display_return_home(void)
 {
 
 	lcd_send_command(LCD_CMD_DIS_RETURN_HOME);
+	mdelay(2);
+
 
 }
 
